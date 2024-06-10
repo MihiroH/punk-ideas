@@ -1,0 +1,5 @@
+pre-commit:
+  commands:
+    frontend-linter:
+      root: frontend/
+      run: npm run check
