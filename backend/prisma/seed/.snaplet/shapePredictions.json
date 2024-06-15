@@ -1,0 +1,148 @@
+[
+  {
+    "schemaName": "public",
+    "tableName": "m_categories",
+    "predictions": [
+      {
+        "input": "public m_categories name",
+        "column": "name",
+        "shape": "COMMERCE_PRODUCT",
+        "confidence": 0.4099870920181274,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "m_report_reasons",
+    "predictions": [
+      {
+        "input": "public m_report_reasons reason_description",
+        "column": "reason_description",
+        "shape": "FINANCE_TRANSACTION_DESCRIPTION",
+        "confidence": 0.9942118525505066,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "m_users",
+    "predictions": [
+      {
+        "input": "public m_users email",
+        "column": "email",
+        "shape": "EMAIL",
+        "confidence": 0.9959896206855774,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public m_users nickname",
+        "column": "nickname",
+        "shape": "INTERNET_DISPLAY_NAME",
+        "confidence": 0.9674544334411621,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public m_users password",
+        "column": "password",
+        "shape": "PASSWORD",
+        "confidence": 0.9958842396736145,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public m_users profile_image",
+        "column": "profile_image",
+        "shape": "INTERNET_AVATAR",
+        "confidence": 0.9309471249580383,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public m_users username",
+        "column": "username",
+        "shape": "USERNAME",
+        "confidence": 0.9965864419937134,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "t_comments",
+    "predictions": [
+      {
+        "input": "public t_comments content",
+        "column": "content",
+        "shape": "POST_COMMENT",
+        "confidence": 0.9270498752593994,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "t_idea_files",
+    "predictions": [
+      {
+        "input": "public t_idea_files file_name",
+        "column": "file_name",
+        "shape": "SYSTEM_FILE_NAME",
+        "confidence": 0.9956120252609253,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public t_idea_files file_path",
+        "column": "file_path",
+        "shape": "SYSTEM_FILE_PATH",
+        "confidence": 0.5505568981170654,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "t_ideas",
+    "predictions": [
+      {
+        "input": "public t_ideas content",
+        "column": "content",
+        "shape": "POST_BODY",
+        "confidence": 0.2667495608329773,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public t_ideas title",
+        "column": "title",
+        "shape": "POST_TITLE",
+        "confidence": 0.4888658821582794,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "t_reports",
+    "predictions": [
+      {
+        "input": "public t_reports report_description",
+        "column": "report_description",
+        "shape": "FINANCE_TRANSACTION_DESCRIPTION",
+        "confidence": 0.7585663795471191,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  }
+]

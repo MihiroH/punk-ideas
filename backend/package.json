@@ -16,10 +16,15 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "format": "npx @biomejs/biome format --write ./src ./apps ./libs ./test",
+    "format": "npx @biomejs/biome format --write ./src ./test ./prisma",
     "format:prisma": "npx prisma format",
-    "lint": "npx @biomejs/biome lint --write ./src ./apps ./libs ./test",
-    "check": "npx @biomejs/biome check --write ./src ./apps ./libs ./test"
+    "lint": "npx @biomejs/biome lint --write ./src ./test ./prisma",
+    "check": "npx @biomejs/biome check --write ./src ./test ./prisma",
+    "migrate": "npx prisma migrate",
+    "migrate:dev": "npx prisma migrate dev",
+    "postmigrate": "npx @snaplet/seed sync",
+    "db:seed": "npx prisma db seed -- --environment production",
+    "db:seed:dev": "npx prisma db seed -- --environment development"
   },
   "dependencies": {
     "@apollo/server": "^4.10.4",
@@ -47,6 +52,8 @@
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
     "@prisma/client": "^5.15.0",
+    "@snaplet/copycat": "^5.0.0",
+    "@snaplet/seed": "^0.97.20",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
@@ -59,6 +66,7 @@
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.15.5",
     "typescript": "^5.1.3"
   },
   "jest": {
@@ -77,5 +85,11 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "@snaplet/seed": {
+    "config": "prisma/seed/seed.config.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed/seed.ts"
   }
 }
