@@ -1,6 +1,6 @@
-# Punk Ideas
+# Punk Ideas API
 
-アイデアを投稿し、共有するためのアプリケーションです。
+[Punk Ideas](https://github.com/MihiroH/punk-ideas)のAPIサーバーです。
 
 ## 技術スタック
 
@@ -10,7 +10,6 @@
 | Prisma     | ORM                          | https://www.prisma.io/                            |
 | Snaplet    | データベースシード管理ツール | https://docs.snaplet.dev/seed/integrations/prisma |
 | Biome      | コードフォーマット & Lint    | https://biomejs.dev/                              |
-| Lefthook   | Gitフック管理ツール          | https://github.com/evilmartians/lefthook          |
 
 ## セットアップ
 
