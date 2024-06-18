@@ -39,7 +39,7 @@ model Idea {
   authorIp  Bytes     @map("author_ip")
   title     String    @map("title")
   content   String    @map("content")
-  openLevel Int       @map("open_level")
+  openLevel Int       @default(1) @map("open_level") // 0: Private, 1: Public
   // aiCheckId Int?      @map("ai_check_id") // TODO: AIチェック機能を実装するときに有効化する
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
