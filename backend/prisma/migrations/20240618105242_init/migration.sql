@@ -21,7 +21,7 @@ CREATE TABLE "t_ideas" (
     "author_ip" BYTEA NOT NULL,
     "title" TEXT NOT NULL,
     "content" TEXT NOT NULL,
-    "open_level" INTEGER NOT NULL,
+    "open_level" INTEGER NOT NULL DEFAULT 1,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),

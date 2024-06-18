@@ -5,44 +5,57 @@
  * Learn more about the Seed Client by following our guide: https://docs.snaplet.dev/seed/getting-started
  */
 import { parseArgs } from 'node:util'
+import { faker } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
+import { OPEN_LEVELS } from '@src/idea/constants'
+
+const now = new Date()
 
 const options = {
   environment: { type: 'string' },
 } as const
 
+const {
+  values: { environment },
+} = parseArgs({ options })
+
+const CATEGORY_NAMES = [
+  '子育て',
+  '介護',
+  '食品',
+  '衣類',
+  '日用品',
+  '住居',
+  '家電',
+  'IT',
+  'コスメ',
+  'スポーツ',
+  '言語',
+  '防犯',
+]
+
+const REPORT_REASON_DESCRIPTIONS = [
+  'アイデアではない',
+  '単に気に入らない',
+  '暴力または危険な団体',
+  '知的財產権の侵害',
+  '違法',
+  '薬物',
+  'その他',
+]
+
 const main = async () => {
-  const {
-    values: { environment },
-  } = parseArgs({ options })
   const baseClient = await createSeedClient()
 
   await baseClient.$resetDatabase()
 
-  const { category } = await baseClient.category([
-    { name: '子育て' },
-    { name: '介護' },
-    { name: '食品' },
-    { name: '衣類' },
-    { name: '日用品' },
-    { name: '住居' },
-    { name: '家電' },
-    { name: 'IT' },
-    { name: 'コスメ' },
-    { name: 'スポーツ' },
-    { name: '言語' },
-    { name: '防犯' },
-  ])
+  const { category } = await baseClient.category(
+    CATEGORY_NAMES.map((categoryName) => ({ name: categoryName, updatedAt: now })),
+  )
 
-  const { reportReason } = await baseClient.reportReason([
-    { reasonDescription: 'アイデアではない' },
-    { reasonDescription: '単に気に入らない' },
-    { reasonDescription: '暴力または危険な団体' },
-    { reasonDescription: '知的財產権の侵害' },
-    { reasonDescription: '違法' },
-    { reasonDescription: '薬物' },
-    { reasonDescription: 'その他' },
-  ])
+  const { reportReason } = await baseClient.reportReason(
+    REPORT_REASON_DESCRIPTIONS.map((reasonDescription) => ({ reasonDescription, updatedAt: now })),
+  )
 
   const seed = await createSeedClient({
     connect: {
@@ -53,15 +66,31 @@ const main = async () => {
 
   switch (environment) {
     case 'development': {
-      const { user } = await seed.user((createMany) => createMany(10))
+      const { user } = await seed.user((createMany) =>
+        createMany(10, () => ({
+          age: faker.number.int({ min: 10, max: 80 }),
+          updatedAt: now,
+          deletedAt: null,
+        })),
+      )
+
       const { idea: _idea } = await seed.idea(
         (createMany) =>
-          createMany(35, {
-            t_idea_categories: (createMany) => createMany({ min: 1, max: 3 }),
-            t_idea_files: (createMany) => createMany({ min: 0, max: 5 }),
-            t_comments: (createMany) => createMany({ min: 0, max: 5 }),
-            t_reports: (createMany) => createMany({ min: 0, max: 5 }),
-          }),
+          createMany(35, () => ({
+            openLevel: faker.helpers.arrayElement([
+              OPEN_LEVELS.private,
+              OPEN_LEVELS.public,
+              OPEN_LEVELS.public,
+              OPEN_LEVELS.public,
+              OPEN_LEVELS.public,
+            ]),
+            updatedAt: now,
+            deletedAt: null,
+            t_idea_categories: (createMany) => createMany({ min: 1, max: 3 }, { updatedAt: now }),
+            t_idea_files: (createMany) => createMany({ min: 0, max: 5 }, { updatedAt: now }),
+            t_comments: (createMany) => createMany({ min: 0, max: 5 }, { updatedAt: now, deletedAt: null }),
+            t_reports: (createMany) => createMany({ min: 0, max: 5 }, { updatedAt: now }),
+          })),
         { connect: { user } },
       )
       break
