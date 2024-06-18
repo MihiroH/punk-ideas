@@ -1,0 +1,11 @@
+pre-commit:
+  commands:
+    frontend-linter:
+      root: frontend/
+      run: npm run check
+    backend-linter:
+      root: backend/
+      run: npm run check
+    backend-prisma-linter:
+      root: backend/
+      run: npm run format:prisma

@@ -1,0 +1,150 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int       @id @default(autoincrement()) @map("id")
+  email        String    @map("email")
+  username     String    @map("username")
+  nickname     String?   @map("nickname")
+  password     String    @map("password")
+  profileImage String?   @map("profile_image")
+  age          Int?      @map("age")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  ideas    Idea[]
+  comments Comment[]
+  // aiCheckLogs AICheckLog[] // TODO: AIチェック機能を実装するときに有効化する
+  Report   Report[]
+
+  @@map("m_users")
+}
+
+model Idea {
+  id        Int       @id @default(autoincrement()) @map("id")
+  authorId  Int       @map("author_id")
+  authorIp  Bytes     @map("author_ip")
+  title     String    @map("title")
+  content   String    @map("content")
+  openLevel Int       @map("open_level")
+  // aiCheckId Int?      @map("ai_check_id") // TODO: AIチェック機能を実装するときに有効化する
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  author         User           @relation(fields: [authorId], references: [id])
+  ideaFiles      IdeaFile[]
+  comments       Comment[]
+  ideaCategories IdeaCategory[]
+  reports        Report[]
+
+  @@map("t_ideas")
+}
+
+model IdeaFile {
+  id        Int      @id @default(autoincrement()) @map("id")
+  ideaId    Int      @map("idea_id")
+  fileName  String   @map("file_name")
+  filePath  String   @map("file_path")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  idea Idea @relation(fields: [ideaId], references: [id])
+
+  @@map("t_idea_files")
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement()) @map("id")
+  ideaId    Int       @map("idea_id")
+  authorId  Int       @map("author_id")
+  authorIp  Bytes     @map("author_ip")
+  content   String    @map("content")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  idea   Idea @relation(fields: [ideaId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
+
+  @@map("t_comments")
+}
+
+model IdeaCategory {
+  id         Int      @id @default(autoincrement()) @map("id")
+  ideaId     Int      @map("idea_id")
+  categoryId Int      @map("category_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  idea     Idea     @relation(fields: [ideaId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@map("t_idea_categories")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement()) @map("id")
+  name      String   @map("name")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  ideaCategories IdeaCategory[]
+
+  @@map("m_categories")
+}
+
+model Report {
+  id                Int      @id @default(autoincrement()) @map("id")
+  ideaId            Int      @map("idea_id")
+  reporterId        Int      @map("reporter_id")
+  reporterIp        Bytes    @map("reporter_ip")
+  reportReasonId    Int      @map("report_reason_id")
+  reportDescription String   @map("report_description")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  idea         Idea         @relation(fields: [ideaId], references: [id])
+  reporter     User         @relation(fields: [reporterId], references: [id])
+  reportReason ReportReason @relation(fields: [reportReasonId], references: [id])
+
+  @@map("t_reports")
+}
+
+model ReportReason {
+  id                Int      @id @default(autoincrement()) @map("id")
+  reasonDescription String   @map("reason_description")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  reports Report[]
+
+  @@map("m_report_reasons")
+}
+
+// TODO: AIチェック機能を実装するときに有効化する
+// model AICheckLog {
+//   id           Int       @id @default(autoincrement()) @map("id")
+//   authorId     Int       @map("author_id")
+//   isMatched    Int       @map("is_matched")
+//   checkDetails String?   @map("check_details")
+//   createdAt    DateTime  @default(now()) @map("created_at")
+//   deletedAt    DateTime? @map("deleted_at")
+//
+//   author User @relation(fields: [authorId], references: [id])
+//
+//   @@map("t_ai_check_logs")
+// }
