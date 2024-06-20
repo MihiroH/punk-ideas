@@ -15,7 +15,6 @@ import { UserService } from './user/user.service'
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    // TODO: 実装時にコメントアウトを外す
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: true,
