@@ -17,7 +17,4 @@ export class CreateIdeaInput {
   @IsOptional()
   @IsIn(Object.values(OPEN_LEVELS), { message: `openLevel must be either ${Object.values(OPEN_LEVELS).join(', ')}` })
   openLevel?: number
-
-  @Field(() => Int)
-  authorId: number
 }

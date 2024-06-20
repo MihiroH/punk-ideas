@@ -6,9 +6,9 @@ type User {
   id: Int!
   email: String!
   username: String!
-  nickname: String!
+  nickname: String
   profileImage: String
-  age: Int!
+  age: Int
   createdAt: DateTime!
   updatedAt: DateTime!
   deletedAt: DateTime
@@ -18,6 +18,11 @@ type User {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type SignInResponse {
+  accessToken: String!
+  user: User!
+}
 
 type Idea {
   id: Int!
@@ -32,18 +37,40 @@ type Idea {
 }
 
 type Query {
-  ideas: [Idea]!
+  user: User
+  ideas(title: String, content: String, openLevel: Int, orderBy: OrderByInput): [Idea]!
   idea(id: Int!): Idea
 }
 
+input OrderByInput {
+  field: String!
+  order: String!
+}
+
 type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  deleteUser(id: Int!): Boolean!
   createIdea(createIdeaInput: CreateIdeaInput!): Idea!
   deleteIdea(id: Int!): Boolean!
+  signIn(signInInput: SignInInput!): SignInResponse!
+}
+
+input CreateUserInput {
+  email: String!
+  username: String!
+  nickname: String
+  password: String!
+  profileImage: String
+  age: Int
 }
 
 input CreateIdeaInput {
   title: String!
   content: String!
   openLevel: Int
-  authorId: Int!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
 }

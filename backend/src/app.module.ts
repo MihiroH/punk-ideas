@@ -4,9 +4,12 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 
+import { AuthModule } from './auth/auth.module'
 import { IdeaModule } from './idea/idea.module'
 import { IdeaService } from './idea/idea.service'
 import { PrismaModule } from './prisma/prisma.module'
+import { UserModule } from './user/user.module'
+import { UserResolver } from './user/user.resolver'
 import { UserService } from './user/user.service'
 
 @Module({
@@ -20,7 +23,9 @@ import { UserService } from './user/user.service'
     }),
     PrismaModule,
     IdeaModule,
+    UserModule,
+    AuthModule,
   ],
-  providers: [IdeaService, UserService],
+  providers: [IdeaService, UserService, UserResolver],
 })
 export class AppModule {}

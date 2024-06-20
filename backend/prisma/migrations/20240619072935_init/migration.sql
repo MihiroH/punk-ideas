@@ -100,6 +100,9 @@ CREATE TABLE "m_report_reasons" (
     CONSTRAINT "m_report_reasons_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
+CREATE UNIQUE INDEX "m_users_email_key" ON "m_users"("email");
+
 -- AddForeignKey
 ALTER TABLE "t_ideas" ADD CONSTRAINT "t_ideas_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "m_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

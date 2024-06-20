@@ -12,18 +12,20 @@ export class User {
   @Field()
   username: string
 
-  @Field()
-  nickname: string
+  @Field({ nullable: true })
+  @IsOptional()
+  nickname?: string
 
   @HideField()
   password: string
 
   @Field({ nullable: true })
   @IsOptional()
-  profileImage: string
+  profileImage?: string
 
-  @Field(() => Int)
-  age: number
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  age?: number
 
   @Field()
   createdAt: Date
