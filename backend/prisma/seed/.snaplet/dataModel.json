@@ -499,6 +499,11 @@
           "name": "m_users_pkey",
           "fields": ["id"],
           "nullNotDistinct": false
+        },
+        {
+          "name": "m_users_email_key",
+          "fields": ["email"],
+          "nullNotDistinct": false
         }
       ]
     },

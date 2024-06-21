@@ -15,7 +15,7 @@ generator client {
 
 model User {
   id           Int       @id @default(autoincrement()) @map("id")
-  email        String    @map("email")
+  email        String    @unique @map("email")
   username     String    @map("username")
   nickname     String?   @map("nickname")
   password     String    @map("password")
@@ -28,7 +28,7 @@ model User {
   ideas    Idea[]
   comments Comment[]
   // aiCheckLogs AICheckLog[] // TODO: AIチェック機能を実装するときに有効化する
-  Report   Report[]
+  reports  Report[]
 
   @@map("m_users")
 }

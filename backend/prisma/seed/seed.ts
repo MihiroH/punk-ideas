@@ -68,6 +68,8 @@ const main = async () => {
     case 'development': {
       const { user } = await seed.user((createMany) =>
         createMany(10, () => ({
+          email: faker.internet.email(),
+          nickname: faker.helpers.arrayElement([faker.person.firstName(), null]),
           age: faker.number.int({ min: 10, max: 80 }),
           updatedAt: now,
           deletedAt: null,

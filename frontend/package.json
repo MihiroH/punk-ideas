@@ -7,8 +7,8 @@
     "start": "next start",
     "next:lint": "next lint",
     "format": "npx @biomejs/biome format --write ./src",
-    "lint": "npx @biomejs/biome lint --write ./src",
-    "check": "npx @biomejs/biome check --write ./src"
+    "lint": "npm run next:lint && npx @biomejs/biome lint --write ./src",
+    "check": "npm run next:lint && npx @biomejs/biome check --write ./src"
   },
   "dependencies": {
     "next": "14.2.3",
