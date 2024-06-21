@@ -48,26 +48,26 @@ input OrderByInput {
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): User!
   deleteUser(id: Int!): Boolean!
   createIdea(createIdeaInput: CreateIdeaInput!): Idea!
   deleteIdea(id: Int!): Boolean!
+  signUp(signUpInput: SignUpInput!): User!
   signIn(signInInput: SignInInput!): SignInResponse!
-}
-
-input CreateUserInput {
-  email: String!
-  username: String!
-  nickname: String
-  password: String!
-  profileImage: String
-  age: Int
 }
 
 input CreateIdeaInput {
   title: String!
   content: String!
   openLevel: Int
+}
+
+input SignUpInput {
+  email: String!
+  username: String!
+  nickname: String
+  password: String!
+  profileImage: String
+  age: Int
 }
 
 input SignInInput {

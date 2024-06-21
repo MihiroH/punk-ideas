@@ -4,7 +4,6 @@ import { User } from '@prisma/client'
 
 import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
-import { CreateUserInput } from './dto/createUser.input'
 import { User as UserModel } from './models/user.model'
 import { UserService } from './user.service'
 
@@ -16,11 +15,6 @@ export class UserResolver {
   @UseGuards(JwtAuthGuard)
   async user(@CurrentUser() user: User): Promise<User> {
     return user
-  }
-
-  @Mutation(() => UserModel)
-  async createUser(@Args('createUserInput') createUserInput: CreateUserInput): Promise<User> {
-    return await this.userService.create(createUserInput)
   }
 
   @Mutation(() => Boolean)

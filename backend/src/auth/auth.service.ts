@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt'
 
 import { UserService } from '@src/user/user.service'
 import { SignInResponse } from './dto/signInResponse'
+import { SignUpInput } from './dto/signUp.input'
 import { JwtPayload } from './types/jwtPayload.type'
 
 @Injectable()
@@ -22,6 +23,10 @@ export class AuthService {
     }
 
     return null
+  }
+
+  async signUp(signUpInput: SignUpInput): Promise<User> {
+    return this.userService.create(signUpInput)
   }
 
   async signIn(user: User): Promise<SignInResponse> {
