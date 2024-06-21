@@ -47,9 +47,6 @@ export class UserService {
       throw new NotFoundException('No User found')
     }
 
-    await this.prismaService.user.update({
-      where: { id },
-      data: { deletedAt: new Date() },
-    })
+    await this.prismaService.softDeleteWithRelations('user', id, ['ideas'])
   }
 }
