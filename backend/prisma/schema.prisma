@@ -28,7 +28,7 @@ model User {
   ideas    Idea[]
   comments Comment[]
   // aiCheckLogs AICheckLog[] // TODO: AIチェック機能を実装するときに有効化する
-  Report   Report[]
+  reports  Report[]
 
   @@map("m_users")
 }
