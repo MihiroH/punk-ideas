@@ -3,7 +3,7 @@ import { IsIn, IsOptional } from 'class-validator'
 
 import { OrderByInput } from '@src/common/dto/orderBy.args'
 import { IsOrderByFieldValid } from '@src/common/validators/isOrderByValid.validator'
-import { OPEN_LEVELS } from '../constants'
+import { OPEN_LEVELS } from '../constants/idea.constant'
 
 @ArgsType()
 export class GetIdeasArgs {
