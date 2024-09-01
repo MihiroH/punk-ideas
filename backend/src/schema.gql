@@ -49,11 +49,19 @@ input OrderByInput {
 }
 
 type Mutation {
+  updateUser(updateUserInput: UpdateUserInput!): User!
   deleteUser: Boolean!
   createIdea(createIdeaInput: CreateIdeaInput!): Idea!
   deleteIdea(id: Int!): Boolean!
   signUp(signUpInput: SignUpInput!): Boolean!
   signIn(signInInput: SignInInput!): SignInResponse!
+}
+
+input UpdateUserInput {
+  username: String
+  nickname: String
+  profileImage: String
+  age: Int
 }
 
 input CreateIdeaInput {

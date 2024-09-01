@@ -1,9 +1,10 @@
 import { UseGuards } from '@nestjs/common'
-import { Mutation, Query, Resolver } from '@nestjs/graphql'
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { User } from '@prisma/client'
 
 import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
+import { UpdateUserInput } from './dto/updateUser.input'
 import { User as UserModel } from './models/user.model'
 import { UserService } from './user.service'
 
@@ -15,6 +16,15 @@ export class UserResolver {
   @UseGuards(JwtAuthGuard)
   async user(@CurrentUser() user: User): Promise<User> {
     return user
+  }
+
+  @Mutation(() => UserModel)
+  @UseGuards(JwtAuthGuard)
+  async updateUser(
+    @Args('updateUserInput') updateUserInput: UpdateUserInput,
+    @CurrentUser() user: User,
+  ): Promise<User> {
+    return this.userService.update(user.id, updateUserInput)
   }
 
   @Mutation(() => Boolean)
