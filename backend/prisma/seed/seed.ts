@@ -7,7 +7,8 @@
 import { parseArgs } from 'node:util'
 import { faker } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
-import { OPEN_LEVELS } from '@src/idea/constants'
+
+import { OPEN_LEVELS } from '@src/idea/constants/idea.constant'
 
 const now = new Date()
 
@@ -71,6 +72,7 @@ const main = async () => {
           email: faker.internet.email(),
           nickname: faker.helpers.arrayElement([faker.person.firstName(), null]),
           age: faker.number.int({ min: 10, max: 80 }),
+          emailVerifiedAt: faker.helpers.arrayElement([now, null]),
           updatedAt: now,
           deletedAt: null,
         })),

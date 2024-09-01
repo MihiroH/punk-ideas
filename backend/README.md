@@ -13,9 +13,15 @@
 
 ## セットアップ
 
+### docker containerの起動
+
+```bash
+$ docker compose up -d
+```
+
 ### npmパッケージのインストール
 
---forceオプションをつけている理由は、自身のマシンと異なるプラットフォームのバイナリをダウンロードする際の警告を無視するためです。  
+`--force`オプションをつけている理由は、自身のマシンと異なるプラットフォームのバイナリをダウンロードする際の警告を無視するためです。  
 
 参考文献:  
 https://unit-code.com/js/react/nextjs/biome-installation/  

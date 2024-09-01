@@ -4,14 +4,25 @@ import * as bcrypt from 'bcrypt'
 
 import { PrismaService } from '@src/prisma/prisma.service'
 import { CreateUserInput } from './dto/createUser.input'
-import { GetUserArgs } from './dto/getUser.args'
+import { UpdateUserInput } from './dto/updateUser.input'
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findOne(getUserArgs: GetUserArgs): Promise<User> {
-    const resource = await this.prismaService.user.findUnique({ where: { ...getUserArgs, deletedAt: null } })
+  async findOneByEmail(email: string, excludeDeleted = true): Promise<User> {
+    const resource = await this.prismaService.user.findUnique({
+      where: {
+        email,
+        deletedAt: excludeDeleted ? null : undefined,
+      },
+    })
+
+    return resource
+  }
+
+  async findOneById(id: number): Promise<User> {
+    const resource = await this.prismaService.user.findUnique({ where: { id, deletedAt: null } })
 
     if (!resource) {
       throw new NotFoundException('No User found')
@@ -21,9 +32,7 @@ export class UserService {
   }
 
   async create(createUserInput: CreateUserInput): Promise<User> {
-    const existingUser = await this.prismaService.user.findUnique({
-      where: { email: createUserInput.email },
-    })
+    const existingUser = await this.findOneByEmail(createUserInput.email, false)
 
     if (existingUser) {
       throw new ConflictException('Email already exists')
@@ -40,8 +49,33 @@ export class UserService {
     })
   }
 
+  async update(id: number, updateUserInput: UpdateUserInput): Promise<User> {
+    const resource = await this.findOneById(id)
+
+    if (!resource) {
+      throw new NotFoundException('No User found')
+    }
+
+    return this.prismaService.user.update({ where: { id }, data: updateUserInput })
+  }
+
+  async verify(id: number) {
+    const resource = await this.findOneById(id)
+
+    if (!resource) {
+      throw new NotFoundException('No User found')
+    }
+
+    const newUser = await this.prismaService.user.update({
+      where: { id },
+      data: { emailVerifiedAt: new Date() },
+    })
+
+    return newUser.emailVerifiedAt !== null
+  }
+
   async softDelete(id: number): Promise<void> {
-    const resource = await this.prismaService.user.findUnique({ where: { id, deletedAt: null } })
+    const resource = await this.findOneById(id)
 
     if (!resource) {
       throw new NotFoundException('No User found')

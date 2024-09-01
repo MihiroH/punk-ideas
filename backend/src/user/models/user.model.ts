@@ -27,6 +27,10 @@ export class User {
   @IsOptional()
   age?: number
 
+  @Field({ nullable: true })
+  @IsOptional()
+  emailVerifiedAt?: Date
+
   @Field()
   createdAt: Date
 
