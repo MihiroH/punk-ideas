@@ -14,16 +14,17 @@ generator client {
 }
 
 model User {
-  id           Int       @id @default(autoincrement()) @map("id")
-  email        String    @unique @map("email")
-  username     String    @map("username")
-  nickname     String?   @map("nickname")
-  password     String    @map("password")
-  profileImage String?   @map("profile_image")
-  age          Int?      @map("age")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  deletedAt    DateTime? @map("deleted_at")
+  id              Int       @id @default(autoincrement()) @map("id")
+  email           String    @unique @map("email")
+  username        String    @map("username")
+  nickname        String?   @map("nickname")
+  password        String    @map("password")
+  profileImage    String?   @map("profile_image")
+  age             Int?      @map("age")
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
 
   ideas    Idea[]
   comments Comment[]

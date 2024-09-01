@@ -7,6 +7,7 @@ import { GraphQLModule } from '@nestjs/graphql'
 import { AuthModule } from './auth/auth.module'
 import { IdeaModule } from './idea/idea.module'
 import { IdeaService } from './idea/idea.service'
+import { MailModule } from './mail/mail.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
 import { UserResolver } from './user/user.resolver'
@@ -24,6 +25,7 @@ import { UserService } from './user/user.service'
     IdeaModule,
     UserModule,
     AuthModule,
+    MailModule,
   ],
   providers: [IdeaService, UserService, UserResolver],
 })

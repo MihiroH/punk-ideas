@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common'
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { Mutation, Query, Resolver } from '@nestjs/graphql'
 import { User } from '@prisma/client'
 
 import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
@@ -19,8 +19,8 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard)
-  async deleteUser(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
-    await this.userService.softDelete(id)
+  async deleteUser(@CurrentUser() user: User): Promise<boolean> {
+    await this.userService.softDelete(user.id)
     return true
   }
 }

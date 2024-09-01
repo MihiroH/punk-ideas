@@ -452,6 +452,20 @@
           "maxLength": null
         },
         {
+          "id": "public.m_users.email_verified_at",
+          "name": "email_verified_at",
+          "columnName": "email_verified_at",
+          "type": "timestamp",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "t_comments",
           "type": "t_comments",
           "isRequired": false,
