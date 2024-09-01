@@ -1,7 +1,7 @@
 import { Field, InputType, Int } from '@nestjs/graphql'
 import { IsIn, IsNotEmpty, IsOptional } from 'class-validator'
 
-import { OPEN_LEVELS } from '../constants'
+import { OPEN_LEVELS } from '../constants/idea.constant'
 
 @InputType()
 export class CreateIdeaInput {

@@ -2,7 +2,7 @@ import { Field, HideField, Int, ObjectType } from '@nestjs/graphql'
 import { IsIn, IsOptional } from 'class-validator'
 
 import { User as UserModel } from '@src/user/models/user.model'
-import { OPEN_LEVELS } from '../constants'
+import { OPEN_LEVELS } from '../constants/idea.constant'
 
 @ObjectType()
 export class Idea {

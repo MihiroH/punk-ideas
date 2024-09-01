@@ -25,7 +25,7 @@ export class IsOrderByFieldValidConstraint implements ValidatorConstraintInterfa
   }
 }
 
-export function IsOrderByFieldValid(fields: string[], validationOptions?: ValidationOptions) {
+export const IsOrderByFieldValid = (fields: string[], validationOptions?: ValidationOptions) => {
   return (object: object, propertyName: string) => {
     registerDecorator({
       target: object.constructor,
