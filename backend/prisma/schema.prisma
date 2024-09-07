@@ -26,12 +26,26 @@ model User {
   updatedAt       DateTime  @updatedAt @map("updated_at")
   deletedAt       DateTime? @map("deleted_at")
 
-  ideas    Idea[]
-  comments Comment[]
+  pendingEmailChanges PendingEmailChange[]
+  ideas               Idea[]
+  comments            Comment[]
   // aiCheckLogs AICheckLog[] // TODO: AIチェック機能を実装するときに有効化する
-  reports  Report[]
+  reports             Report[]
 
   @@map("m_users")
+}
+
+model PendingEmailChange {
+  id        Int       @id @default(autoincrement()) @map("id")
+  userId    Int       @map("user_id")
+  email     String    @map("email")
+  token     String    @map("token")
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("t_pending_email_changes")
 }
 
 model Idea {

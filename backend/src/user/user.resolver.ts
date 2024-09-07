@@ -1,9 +1,9 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
-import { User } from '@prisma/client'
 
 import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
+import { User } from '@src/user/models/user.model'
 import { UpdateUserInput } from './dto/updateUser.input'
 import { User as UserModel } from './models/user.model'
 import { UserService } from './user.service'

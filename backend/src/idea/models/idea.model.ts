@@ -1,7 +1,7 @@
 import { Field, HideField, Int, ObjectType } from '@nestjs/graphql'
 import { IsIn, IsOptional } from 'class-validator'
 
-import { User as UserModel } from '@src/user/models/user.model'
+import { User } from '@src/user/models/user.model'
 import { OPEN_LEVELS } from '../constants/idea.constant'
 
 @ObjectType()
@@ -35,6 +35,7 @@ export class Idea {
   @IsOptional()
   deletedAt?: Date
 
-  @Field(() => UserModel)
-  author: UserModel
+  @Field(() => User, { nullable: true })
+  @IsOptional()
+  author?: User
 }

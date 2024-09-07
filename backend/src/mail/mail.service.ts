@@ -4,6 +4,8 @@ import { ConfigService } from '@nestjs/config'
 import { createSendVerificationEmailOptions } from './helpers/createSendVerificationEmailOptions.helper'
 import { MailPitService } from './mailpit.service'
 import { SESService } from './ses.service'
+import * as emailChangeVerificationTemplate from './templates/emailChangeVerification.template'
+import * as registrationVerificationTemplate from './templates/registrationVerification.template'
 import { IMailService } from './types/mailService.interface'
 
 @Injectable()
@@ -30,8 +32,8 @@ export class MailService {
     }
   }
 
-  sendVerificationEmail(email: string, token: string, username?: string): Promise<boolean> {
-    const mailVerificationUrl = this.configService.get('MAIL_VERIFICATION_URL')
+  sendRegistrationVerificationEmail(email: string, token: string, username?: string): Promise<boolean> {
+    const mailVerificationUrl = this.configService.get('MAIL_REGISTRATION_VERIFICATION_URL')
     const sendEmailOptions = createSendVerificationEmailOptions({
       username,
       fromAddress: this.fromAddress,
@@ -39,6 +41,24 @@ export class MailService {
       mailVerificationUrl,
       token,
       tokenExpirationTime: this.tokenExpirationTime,
+      subject: registrationVerificationTemplate.subject,
+      bodyTemplate: registrationVerificationTemplate.body,
+    })
+
+    return this.mailService.sendVerificationEmail(sendEmailOptions)
+  }
+
+  sendEmailChangeVerificationEmail(email: string, token: string, username?: string): Promise<boolean> {
+    const mailVerificationUrl = this.configService.get('MAIL_CHANGE_EMAIL_VERIFICATION_URL')
+    const sendEmailOptions = createSendVerificationEmailOptions({
+      username,
+      fromAddress: this.fromAddress,
+      toAddress: email,
+      mailVerificationUrl,
+      token,
+      tokenExpirationTime: this.tokenExpirationTime,
+      subject: emailChangeVerificationTemplate.subject,
+      bodyTemplate: emailChangeVerificationTemplate.body,
     })
 
     return this.mailService.sendVerificationEmail(sendEmailOptions)

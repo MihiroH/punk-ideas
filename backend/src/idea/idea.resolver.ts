@@ -1,11 +1,12 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
-import { Idea, User } from '@prisma/client'
+import { Idea } from '@prisma/client'
 import { Request } from 'express'
 
 import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { OptionalJwtAuthGuard } from '@src/auth/guards/optionalJwtAuth.guard'
+import { User } from '@src/user/models/user.model'
 import { CreateIdeaInput } from './dto/createIdea.input'
 import { GetIdeasArgs } from './dto/getIdeas.args'
 import { IdeaService } from './idea.service'

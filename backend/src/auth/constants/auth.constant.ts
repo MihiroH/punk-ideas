@@ -1,13 +1,18 @@
-export const UNAUTHORIZED_ERROR_MESSAGE = {
-  userNotFound: 'User not found.',
-  userNotVerified: 'User not verified.',
-  invalidToken: 'Invalid token.',
-  emailVerificationFailed: 'Email verification failed.',
-} as const
-
-export const UNAUTHORIZED_ERROR_CODE = {
-  userNotFound: 'USER_NOT_FOUND',
-  userNotVerified: 'USER_NOT_VERIFIED',
-  invalidToken: 'INVALID_TOKEN',
-  emailVerificationFailed: 'EMAIL_VERIFICATION_FAILED',
+export const UNAUTHORIZED_ERROR = {
+  userNotFound: {
+    message: 'User not found.',
+    code: 'USER_NOT_FOUND',
+  },
+  userNotVerified: {
+    message: 'User not verified.',
+    code: 'USER_NOT_VERIFIED',
+  },
+  invalidToken: {
+    message: 'Invalid token.',
+    code: 'INVALID_TOKEN',
+  },
+  incorrectPassword: {
+    message: 'Incorrect password.',
+    code: 'INCORRECT_PASSWORD',
+  },
 } as const

@@ -1,28 +1,34 @@
-import { Injectable } from '@nestjs/common'
+import { ConflictException, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
-import { User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
 import { MailService } from '@src/mail/mail.service'
+import { PendingEmailChangeService } from '@src/pendingEmailChange/pendingEmailChange.service'
+import { PrismaService } from '@src/prisma/prisma.service'
+import { User } from '@src/user/models/user.model'
 import { UserService } from '@src/user/user.service'
+import { RequestEmailChangeInput } from './dto/requestEmailChange.input'
 import { SignInResponse } from './dto/signInResponse'
 import { SignUpInput } from './dto/signUp.input'
 import { CustomUnauthorizedException } from './errors/unauthorized.exception'
-import { JwtPayload } from './types/jwtPayload.type'
+import { JwtPayload } from './types/jwt.type'
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
+    private configService: ConfigService,
+    private prismaService: PrismaService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private pendingEmailChangeService: PendingEmailChangeService,
+    private userService: UserService,
   ) {}
 
   async signUp(signUpInput: SignUpInput): Promise<boolean> {
     const newUser = await this.userService.create(signUpInput)
-
-    const emailVerificationToken = this.jwtService.sign({ userId: newUser.id }, { expiresIn: '1h' })
-    const isEmailSent = await this.mailService.sendVerificationEmail(
+    const emailVerificationToken = this.generateJwtToken(newUser.id, newUser.email)
+    const isEmailSent = await this.mailService.sendRegistrationVerificationEmail(
       newUser.email,
       emailVerificationToken,
       newUser.username,
@@ -36,29 +42,91 @@ export class AuthService {
       throw new CustomUnauthorizedException('userNotVerified')
     }
 
-    const payload: JwtPayload = { email: user.email, sub: user.id }
-
     return {
-      accessToken: this.jwtService.sign(payload),
+      accessToken: this.generateJwtToken(user.id, user.email),
       user,
     }
   }
 
-  async verifyUser(userId: number) {
+  async requestEmailChange(userId: number, requestEmailChangeInput: RequestEmailChangeInput): Promise<boolean> {
+    const user = await this.userService.findOneById(userId)
+
+    if (!user) {
+      throw new CustomUnauthorizedException('userNotFound')
+    }
+
+    const isPasswordCorrect = await this.isPasswordCorrect(requestEmailChangeInput.currentPassword, user)
+
+    if (!isPasswordCorrect) {
+      throw new CustomUnauthorizedException('incorrectPassword')
+    }
+
+    const isEmailTaken = await this.userService.findOneByEmail(requestEmailChangeInput.newEmail)
+
+    if (isEmailTaken) {
+      throw new ConflictException('Email already exists')
+    }
+
+    const emailVerificationToken = this.generateJwtToken(userId, requestEmailChangeInput.newEmail)
+    const isEmailSent = await this.mailService.sendEmailChangeVerificationEmail(
+      requestEmailChangeInput.newEmail,
+      emailVerificationToken,
+      user.username,
+    )
+
+    let isPendingEmailChangeCreated = false
+
+    if (isEmailSent) {
+      const pendingEmailChange = await this.pendingEmailChangeService.create(
+        userId,
+        requestEmailChangeInput.newEmail,
+        emailVerificationToken,
+      )
+      isPendingEmailChangeCreated = !!pendingEmailChange
+    }
+
+    return isEmailSent && isPendingEmailChangeCreated
+  }
+
+  generateJwtToken(userId: number, email: string): string {
+    return this.jwtService.sign({ email, sub: userId }, { expiresIn: this.configService.get('JWT_EXPIRES_IN') })
+  }
+
+  verifyJwtToken(token: string): JwtPayload {
+    return this.jwtService.decode(token)
+  }
+
+  async verifyUser(userId: number): Promise<boolean> {
     return await this.userService.verify(userId)
   }
 
-  isEmailVerified(user: User) {
+  async verifyEmailChange(userId: number, newEmail: string, pendingEmailChangeId: number): Promise<boolean> {
+    try {
+      await this.prismaService.runTransaction(async () => {
+        await this.userService.verifyAndChangeEmail(userId, newEmail)
+        await this.pendingEmailChangeService.softDelete(pendingEmailChangeId)
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  isEmailVerified(user: User): boolean {
     return user.emailVerifiedAt !== null
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.userService.findOneByEmail(email)
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user && (await this.isPasswordCorrect(password, user))) {
       return user
     }
 
     return null
+  }
+
+  async isPasswordCorrect(password: string, user: User): Promise<boolean> {
+    return await bcrypt.compare(password, user.password)
   }
 }

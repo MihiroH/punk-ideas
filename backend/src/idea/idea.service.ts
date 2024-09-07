@@ -27,11 +27,11 @@ export class IdeaService {
       },
     }
 
-    return await this.prismaService.idea.findMany(queryOptions)
+    return await this.prismaService.client.idea.findMany(queryOptions)
   }
 
   async findOne(id: number): Promise<Idea> {
-    const resource = await this.prismaService.idea.findUnique({
+    const resource = await this.prismaService.client.idea.findUnique({
       where: {
         id,
         deletedAt: null,
@@ -49,27 +49,23 @@ export class IdeaService {
   }
 
   async create(createIdeaInput: CreateIdeaInput, authorId: number, authorIp: string): Promise<Idea> {
-    return await this.prismaService.idea.create({
+    return await this.prismaService.client.idea.create({
       data: {
         ...createIdeaInput,
+        authorId,
         authorIp: Buffer.from(authorIp),
-        author: {
-          connect: {
-            id: authorId,
-          },
-        },
       },
     })
   }
 
   async softDelete(id: number): Promise<void> {
-    const resource = await this.prismaService.idea.findUnique({ where: { id, deletedAt: null } })
+    const resource = await this.prismaService.client.idea.findUnique({ where: { id, deletedAt: null } })
 
     if (!resource) {
       throw new NotFoundException('No Idea found')
     }
 
-    await this.prismaService.idea.update({
+    await this.prismaService.client.idea.update({
       where: { id },
       data: { deletedAt: new Date() },
     })
