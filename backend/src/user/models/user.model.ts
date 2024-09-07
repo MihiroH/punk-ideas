@@ -1,6 +1,8 @@
 import { Field, HideField, Int, ObjectType } from '@nestjs/graphql'
 import { IsOptional } from 'class-validator'
 
+import { Idea } from '@src/idea/models/idea.model'
+
 @ObjectType()
 export class User {
   @Field(() => Int)
@@ -40,4 +42,8 @@ export class User {
   @Field({ nullable: true })
   @IsOptional()
   deletedAt?: Date
+
+  @Field(() => [Idea], { nullable: true })
+  @IsOptional()
+  ideas?: Idea[]
 }

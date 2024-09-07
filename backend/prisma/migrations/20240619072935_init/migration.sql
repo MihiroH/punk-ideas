@@ -2,6 +2,7 @@
 CREATE TABLE "m_users" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
+    "email_verified_at" TIMESTAMP(3),
     "username" TEXT NOT NULL,
     "nickname" TEXT,
     "password" TEXT NOT NULL,
