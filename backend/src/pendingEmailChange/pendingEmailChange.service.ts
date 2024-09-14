@@ -1,21 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { PendingEmailChange } from '@prisma/client'
+import { Injectable } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
+
+import { ResourceNotFoundException } from '@src/common/libs/errors/resourceNotFound.exception'
+import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
+import { PendingEmailChange } from './models/pendingEmailChange.model'
 
 @Injectable()
 export class PendingEmailChangeService {
   constructor(private prismaService: PrismaService) {}
 
-  async findOneByUserIdAndToken(userId: number, token: string): Promise<PendingEmailChange> {
-    const resource = await this.prismaService.client.pendingEmailChange.findFirst({
+  async findByUserIdAndToken(userId: number, token: string): Promise<PendingEmailChange> {
+    return await this.prismaService.client.pendingEmailChange.findFirst({
       where: {
         userId,
         token,
         deletedAt: null,
       },
     })
-
-    return resource
   }
 
   async create(userId: number, email: string, token: string): Promise<PendingEmailChange> {
@@ -28,16 +30,27 @@ export class PendingEmailChangeService {
     })
   }
 
-  async softDelete(id: number): Promise<void> {
-    const resource = await this.prismaService.client.pendingEmailChange.findUnique({ where: { id, deletedAt: null } })
+  async update(args: Prisma.PendingEmailChangeUpdateArgs): Promise<PendingEmailChange> {
+    try {
+      return await this.prismaService.client.pendingEmailChange.update(args)
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PRISMA_CLIENT_ERROR_CODE.recordsNotFound
+      ) {
+        throw new ResourceNotFoundException(error.message)
+      }
 
-    if (!resource) {
-      throw new NotFoundException('No Pending-Email-Change found')
+      throw error
     }
+  }
 
-    await this.prismaService.client.pendingEmailChange.update({
+  async softDelete(id: number): Promise<boolean> {
+    const deletedPendingEmailChange = await this.update({
       where: { id },
       data: { deletedAt: new Date() },
     })
+
+    return !!deletedPendingEmailChange
   }
 }

@@ -39,7 +39,7 @@ type SignInResponse {
 }
 
 type Query {
-  ideas(title: String, content: String, openLevel: Int, orderBy: OrderByInput): [Idea]!
+  ideas(title: String, content: String, openLevel: Int, orderBy: OrderByInput): [Idea!]
   idea(id: Int!): Idea
   user: User
 }
@@ -52,7 +52,7 @@ input OrderByInput {
 type Mutation {
   createIdea(createIdeaInput: CreateIdeaInput!): Idea!
   deleteIdea(id: Int!): Boolean!
-  updateUser(updateUserInput: UpdateUserInput!): User!
+  updateUserProfile(updateUserProfileInput: UpdateUserProfileInput!): User!
   deleteUser: Boolean!
   signUp(signUpInput: SignUpInput!): Boolean!
   signIn(signInInput: SignInInput!): SignInResponse!
@@ -65,7 +65,7 @@ input CreateIdeaInput {
   openLevel: Int
 }
 
-input UpdateUserInput {
+input UpdateUserProfileInput {
   username: String
   nickname: String
   profileImage: String

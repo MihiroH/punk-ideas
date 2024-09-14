@@ -2,7 +2,7 @@ import { ExecutionContext, Injectable } from '@nestjs/common'
 import { GqlExecutionContext } from '@nestjs/graphql'
 import { JsonWebTokenError, NotBeforeError, TokenExpiredError } from '@nestjs/jwt'
 import { AuthGuard } from '@nestjs/passport'
-import { CustomUnauthorizedException } from '../errors/unauthorized.exception'
+import { CustomUnauthorizedException } from '../errors/customUnauthorized.exception'
 
 @Injectable()
 export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
@@ -14,7 +14,7 @@ export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
 
     // JWTトークンが不正な場合はエラーをスロー
     if (info instanceof JsonWebTokenError || info instanceof TokenExpiredError || info instanceof NotBeforeError) {
-      throw new CustomUnauthorizedException('invalidToken', info)
+      throw new CustomUnauthorizedException('invalidToken', info.message)
     }
 
     // JWTトークンがない場合はリクエストを続行
