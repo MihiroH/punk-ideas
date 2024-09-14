@@ -28,9 +28,10 @@ export class CustomExceptionFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR
 
     // 例えばCustomBadRequestExceptionは複数のエラーメッセージを含む可能性があるためmessagesプロパティを用意している
-    const message = 'messages' in exception && Array.isArray(exception.messages)
-      ? exception.messages
-      : `[${exception.name}]: ${this.exceptionShortMessage(exception.message)}`
+    const message =
+      'messages' in exception && Array.isArray(exception.messages)
+        ? exception.messages
+        : `[${exception.name}]: ${this.exceptionShortMessage(exception.message)}`
 
     const responseBody = HttpException.createBody(message, exception.name, status)
 
