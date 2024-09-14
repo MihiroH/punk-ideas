@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 import { SORT_ORDER, VSortOrders } from '@src/common/constants/sortOrder.constant'
@@ -22,14 +22,31 @@ const defaultOrderBy = {
 //       get client()で返すthisが"user"や"idea"を持たなくなるため、PrismaClientのインスタンス化を独自で行う
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
-  private prismaClient: PrismaClient
+  private prismaClient: PrismaClient<Prisma.PrismaClientOptions, Prisma.LogLevel>
   private transactionClient: Prisma.TransactionClient = null
+  private logger: Logger
 
   constructor() {
-    this.prismaClient = new PrismaClient()
+    this.prismaClient = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] })
+    this.logger = new Logger(PrismaService.name)
   }
 
   async onModuleInit() {
+    // TODO: ログをファイルに書き込む
+    // @see: https://chatgpt.com/share/66e535ae-79b8-8003-9c0b-25902cce3a7f
+    this.prismaClient.$on('query', (event: Prisma.QueryEvent) => {
+      this.logger.log(`Query: ${event.query}`, `Params: ${event.params}`, `Duration: ${event.duration} ms`)
+    })
+    this.prismaClient.$on('info', (event) => {
+      this.logger.log(`message: ${event.message}`)
+    })
+    this.prismaClient.$on('error', (event) => {
+      this.logger.log(`error: ${event.message}`)
+    })
+    this.prismaClient.$on('warn', (event) => {
+      this.logger.log(`warn: ${event.message}`)
+    })
+
     await this.prismaClient.$connect()
   }
 
