@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
@@ -6,12 +6,13 @@ import * as bcrypt from 'bcrypt'
 import { MailService } from '@src/mail/mail.service'
 import { PendingEmailChangeService } from '@src/pendingEmailChange/pendingEmailChange.service'
 import { PrismaService } from '@src/prisma/prisma.service'
+import { EmailAlreadyExistsException } from '@src/user/errors/emailAlreadyExists.exception'
 import { User } from '@src/user/models/user.model'
 import { UserService } from '@src/user/user.service'
 import { RequestEmailChangeInput } from './dto/requestEmailChange.input'
 import { SignInResponse } from './dto/signInResponse'
 import { SignUpInput } from './dto/signUp.input'
-import { CustomUnauthorizedException } from './errors/unauthorized.exception'
+import { CustomUnauthorizedException } from './errors/customUnauthorized.exception'
 import { JwtPayload } from './types/jwt.type'
 
 @Injectable()
@@ -49,22 +50,14 @@ export class AuthService {
   }
 
   async requestEmailChange(userId: number, requestEmailChangeInput: RequestEmailChangeInput): Promise<boolean> {
-    const user = await this.userService.findOneById(userId)
+    const user = await this.userService.findById(userId)
 
-    if (!user) {
-      throw new CustomUnauthorizedException('userNotFound')
-    }
-
-    const isPasswordCorrect = await this.isPasswordCorrect(requestEmailChangeInput.currentPassword, user)
-
-    if (!isPasswordCorrect) {
+    if (!(await this.isPasswordCorrect(requestEmailChangeInput.currentPassword, user))) {
       throw new CustomUnauthorizedException('incorrectPassword')
     }
 
-    const isEmailTaken = await this.userService.findOneByEmail(requestEmailChangeInput.newEmail)
-
-    if (isEmailTaken) {
-      throw new ConflictException('Email already exists')
+    if (await this.userService.isEmailExists(requestEmailChangeInput.newEmail)) {
+      throw new EmailAlreadyExistsException()
     }
 
     const emailVerificationToken = this.generateJwtToken(userId, requestEmailChangeInput.newEmail)
@@ -101,15 +94,11 @@ export class AuthService {
   }
 
   async verifyEmailChange(userId: number, newEmail: string, pendingEmailChangeId: number): Promise<boolean> {
-    try {
-      await this.prismaService.runTransaction(async () => {
-        await this.userService.verifyAndChangeEmail(userId, newEmail)
-        await this.pendingEmailChangeService.softDelete(pendingEmailChangeId)
-      })
-      return true
-    } catch {
-      return false
-    }
+    await this.prismaService.runTransaction(async () => {
+      await this.userService.verifyAndChangeEmail(userId, newEmail)
+      await this.pendingEmailChangeService.softDelete(pendingEmailChangeId)
+    })
+    return true
   }
 
   isEmailVerified(user: User): boolean {
@@ -117,7 +106,7 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.userService.findOneByEmail(email)
+    const user = await this.userService.findByEmail(email)
 
     if (user && (await this.isPasswordCorrect(password, user))) {
       return user

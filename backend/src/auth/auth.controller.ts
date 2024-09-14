@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt'
 
 import { PendingEmailChangeService } from '@src/pendingEmailChange/pendingEmailChange.service'
 import { AuthService } from './auth.service'
-import { CustomUnauthorizedException } from './errors/unauthorized.exception'
+import { CustomUnauthorizedException } from './errors/customUnauthorized.exception'
 import { JwtPayload } from './types/jwt.type'
 
 @Controller('auth')
@@ -23,7 +23,7 @@ export class AuthController {
     try {
       decoded = this.authService.verifyJwtToken(token)
     } catch (error) {
-      throw new CustomUnauthorizedException('invalidToken', error)
+      throw new CustomUnauthorizedException('invalidToken', error.message)
     }
 
     await this.authService.verifyUser(decoded.sub)
@@ -41,7 +41,7 @@ export class AuthController {
       throw new CustomUnauthorizedException('invalidToken', error)
     }
 
-    const pendingEmailChange = await this.pendingEmailChangeService.findOneByUserIdAndToken(decoded.sub, token)
+    const pendingEmailChange = await this.pendingEmailChangeService.findByUserIdAndToken(decoded.sub, token)
 
     if (!pendingEmailChange || pendingEmailChange.email !== decoded.email) {
       throw new CustomUnauthorizedException('invalidToken')

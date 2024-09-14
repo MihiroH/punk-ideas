@@ -4,7 +4,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { User } from '@src/user/models/user.model'
-import { UpdateUserInput } from './dto/updateUser.input'
+import { UpdateUserProfileInput } from './dto/updateUser.input'
 import { User as UserModel } from './models/user.model'
 import { UserService } from './user.service'
 
@@ -15,22 +15,21 @@ export class UserResolver {
   @Query(() => UserModel, { nullable: true })
   @UseGuards(JwtAuthGuard)
   async user(@CurrentUser() user: User): Promise<User> {
-    return user
+    return this.userService.findById(user.id)
   }
 
   @Mutation(() => UserModel)
   @UseGuards(JwtAuthGuard)
-  async updateUser(
-    @Args('updateUserInput') updateUserInput: UpdateUserInput,
+  async updateUserProfile(
+    @Args('updateUserProfileInput') updateUserProfileInput: UpdateUserProfileInput,
     @CurrentUser() user: User,
   ): Promise<User> {
-    return this.userService.update(user.id, updateUserInput)
+    return this.userService.updateProfile(user.id, updateUserProfileInput)
   }
 
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard)
   async deleteUser(@CurrentUser() user: User): Promise<boolean> {
-    await this.userService.softDelete(user.id)
-    return true
+    return await this.userService.softDeleteWithRelations(user.id)
   }
 }

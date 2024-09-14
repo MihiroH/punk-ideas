@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql'
-import { User } from '@prisma/client'
 
+import { User } from '@src/user/models/user.model'
 import { AuthService } from './auth.service'
 import { CurrentUser } from './decorators/currentUser.decorator'
 import { RequestEmailChangeInput } from './dto/requestEmailChange.input'

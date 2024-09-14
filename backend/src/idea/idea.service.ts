@@ -1,9 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { Idea, Prisma } from '@prisma/client'
-import { PrismaService } from '@src/prisma/prisma.service'
+import { Injectable } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
 
+import { ResourceNotFoundException } from '@src/common/libs/errors/resourceNotFound.exception'
+import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
+import { PrismaService } from '@src/prisma/prisma.service'
 import { CreateIdeaInput } from './dto/createIdea.input'
 import { GetIdeasArgs } from './dto/getIdeas.args'
+import { Idea } from './models/idea.model'
 
 @Injectable()
 export class IdeaService {
@@ -30,8 +33,8 @@ export class IdeaService {
     return await this.prismaService.client.idea.findMany(queryOptions)
   }
 
-  async findOne(id: number): Promise<Idea> {
-    const resource = await this.prismaService.client.idea.findUnique({
+  async findById(id: number): Promise<Idea> {
+    return await this.prismaService.client.idea.findUniqueOrThrow({
       where: {
         id,
         deletedAt: null,
@@ -40,12 +43,6 @@ export class IdeaService {
         author: true,
       },
     })
-
-    if (!resource) {
-      throw new NotFoundException('No Idea found')
-    }
-
-    return resource
   }
 
   async create(createIdeaInput: CreateIdeaInput, authorId: number, authorIp: string): Promise<Idea> {
@@ -58,16 +55,27 @@ export class IdeaService {
     })
   }
 
-  async softDelete(id: number): Promise<void> {
-    const resource = await this.prismaService.client.idea.findUnique({ where: { id, deletedAt: null } })
+  async update(args: Prisma.IdeaUpdateArgs): Promise<Idea> {
+    try {
+      return await this.prismaService.client.idea.update(args)
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PRISMA_CLIENT_ERROR_CODE.recordsNotFound
+      ) {
+        throw new ResourceNotFoundException(error.message)
+      }
 
-    if (!resource) {
-      throw new NotFoundException('No Idea found')
+      throw error
     }
+  }
 
-    await this.prismaService.client.idea.update({
+  async softDelete(id: number): Promise<boolean> {
+    const deletedIdea = await this.update({
       where: { id },
       data: { deletedAt: new Date() },
     })
+
+    return !!deletedIdea
   }
 }

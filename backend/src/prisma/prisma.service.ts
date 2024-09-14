@@ -3,7 +3,9 @@ import { Prisma, PrismaClient } from '@prisma/client'
 
 import { SORT_ORDER, VSortOrders } from '@src/common/constants/sortOrder.constant'
 import { OrderByInput } from '@src/common/dto/orderBy.args'
+import { ResourceNotFoundException } from '@src/common/libs/errors/resourceNotFound.exception'
 import { CamelCase } from '@src/common/types/string.type'
+import { PRISMA_CLIENT_ERROR_CODE } from './constants/prisma.constant'
 
 type ModelDelegateForUpdate = PrismaClient[keyof PrismaClient] & {
   update(args: { where: { id: number }; data: object }): Prisma.PrismaPromise<unknown>
@@ -79,7 +81,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     relations: Relations<Capitalize<T>>[],
   ) {
     const relationsQuery = relations.reduce((acc, relation) => {
-      acc[relation as string] = {
+      acc[String(relation)] = {
         updateMany: {
           where: { deletedAt: null },
           data: { deletedAt: new Date() },
@@ -90,12 +92,23 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
     const modelDelegate: ModelDelegateForUpdate = this.client[modelName]
 
-    return await modelDelegate.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-        ...relationsQuery,
-      },
-    })
+    try {
+      return await modelDelegate.update({
+        where: { id },
+        data: {
+          deletedAt: new Date(),
+          ...relationsQuery,
+        },
+      })
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PRISMA_CLIENT_ERROR_CODE.recordsNotFound
+      ) {
+        throw new ResourceNotFoundException(error.message)
+      }
+
+      throw error
+    }
   }
 }

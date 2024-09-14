@@ -4,7 +4,7 @@ import { Strategy } from 'passport-local'
 
 import { User } from '@src/user/models/user.model'
 import { AuthService } from '../auth.service'
-import { CustomUnauthorizedException } from '../errors/unauthorized.exception'
+import { CustomUnauthorizedException } from '../errors/customUnauthorized.exception'
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
