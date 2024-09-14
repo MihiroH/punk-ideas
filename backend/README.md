@@ -43,7 +43,7 @@ $ npm run db:seed:dev
 $ npm run migrate
 ```
 
-## サーバー起動
+## Webサーバー起動
 
 ```bash
 # ローカル環境
