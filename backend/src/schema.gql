@@ -45,6 +45,9 @@ type Idea {
   updatedAt: DateTime!
   deletedAt: DateTime
   author: User
+  comments: [Comment!]
+  ideaCategories: [IdeaCategory!]
+  categories: [Category!]
 }
 
 type User {

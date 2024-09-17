@@ -4,55 +4,69 @@ import { Prisma } from '@prisma/client'
 import { ResourceNotFoundException } from '@src/common/libs/errors/resourceNotFound.exception'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
-import { CreateIdeaInput } from './dto/createIdea.input'
 import { GetIdeasArgs } from './dto/getIdeas.args'
+import { IdeaCreateInput } from './dto/ideaCreate.input'
 import { Idea } from './models/idea.model'
 
 @Injectable()
 export class IdeaService {
   constructor(private prismaService: PrismaService) {}
 
-  async findMany(args?: { getIdeasArgs?: GetIdeasArgs; authorId?: number }): Promise<Idea[]> {
-    const { authorId, getIdeasArgs } = args ?? {}
-    const { orderBy, title, content, ...restFilter } = getIdeasArgs ?? {}
+  async create(data: IdeaCreateInput, authorId: number, authorIp: string): Promise<Idea> {
+    const { categoryIds, ...restData } = data
 
-    const queryOptions: Prisma.IdeaFindManyArgs = {
+    return await this.prismaService.client.idea.create({
+      data: {
+        ...restData,
+        authorId,
+        authorIp: Buffer.from(authorIp),
+        ideaCategories: {
+          create: categoryIds?.map((categoryId) => ({
+            category: {
+              connect: { id: categoryId },
+            },
+          })),
+        },
+      },
+    })
+  }
+
+  formatIdea(idea: Idea): Idea {
+    return {
+      ...idea,
+      categories: idea.ideaCategories?.map((category) => category.category),
+    }
+  }
+
+  async findMany(args?: { getIdeasArgs?: GetIdeasArgs; authorId?: number }, include?: Prisma.IdeaInclude) {
+    const { authorId, getIdeasArgs } = args ?? {}
+    const { title, content, orderBy, ...restFilter } = getIdeasArgs ?? {}
+
+    const resources = await this.prismaService.client.idea.findMany({
       where: {
+        authorId,
         title: { contains: title },
         content: { contains: content },
         deletedAt: null,
         ...restFilter,
-        authorId,
       },
       orderBy: this.prismaService.formatOrderBy(orderBy),
-      include: {
-        author: true,
-      },
-    }
+      include,
+    })
 
-    return await this.prismaService.client.idea.findMany(queryOptions)
+    return resources.map(this.formatIdea)
   }
 
-  async findById(id: number): Promise<Idea> {
-    return await this.prismaService.client.idea.findUniqueOrThrow({
+  async findById(id: number, include?: Prisma.IdeaInclude): Promise<Idea> {
+    const resource = await this.prismaService.client.idea.findUniqueOrThrow({
       where: {
         id,
         deletedAt: null,
       },
-      include: {
-        author: true,
-      },
+      include,
     })
-  }
 
-  async create(createIdeaInput: CreateIdeaInput, authorId: number, authorIp: string): Promise<Idea> {
-    return await this.prismaService.client.idea.create({
-      data: {
-        ...createIdeaInput,
-        authorId,
-        authorIp: Buffer.from(authorIp),
-      },
-    })
+    return this.formatIdea(resource)
   }
 
   async update(args: Prisma.IdeaUpdateArgs): Promise<Idea> {
