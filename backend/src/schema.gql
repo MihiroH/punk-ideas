@@ -2,6 +2,39 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Category {
+  id: Int!
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Comment {
+  id: Int!
+  ideaId: Int!
+  authorId: Int!
+  content: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+  author: User
+  idea: Idea
+}
+
+type IdeaCategory {
+  id: Int!
+  ideaId: Int!
+  categoryId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  category: Category!
+}
+
 type Idea {
   id: Int!
   authorId: Int!
@@ -12,12 +45,10 @@ type Idea {
   updatedAt: DateTime!
   deletedAt: DateTime
   author: User
+  comments: [Comment!]
+  ideaCategories: [IdeaCategory!]
+  categories: [Category!]
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type User {
   id: Int!
@@ -39,9 +70,10 @@ type SignInResponse {
 }
 
 type Query {
+  user: User
+  categories: [Category!]!
   ideas(title: String, content: String, openLevel: Int, orderBy: OrderByInput): [Idea!]
   idea(id: Int!): Idea
-  user: User
 }
 
 input OrderByInput {
@@ -50,26 +82,14 @@ input OrderByInput {
 }
 
 type Mutation {
-  createIdea(createIdeaInput: CreateIdeaInput!): Idea!
-  deleteIdea(id: Int!): Boolean!
-  updateUserProfile(updateUserProfileInput: UpdateUserProfileInput!): User!
-  deleteUser: Boolean!
   signUp(signUpInput: SignUpInput!): Boolean!
   signIn(signInInput: SignInInput!): SignInResponse!
   requestEmailChange(requestEmailChangeInput: RequestEmailChangeInput!): Boolean!
-}
-
-input CreateIdeaInput {
-  title: String!
-  content: String!
-  openLevel: Int
-}
-
-input UpdateUserProfileInput {
-  username: String
-  nickname: String
-  profileImage: String
-  age: Int
+  updateUserProfile(updateUserProfileInput: UpdateUserProfileInput!): User!
+  deleteUser: Boolean!
+  createComment(commentCreateInput: CommentCreateInput!): Comment!
+  createIdea(ideaCreateInput: IdeaCreateInput!): Idea!
+  deleteIdea(id: Int!): Boolean!
 }
 
 input SignUpInput {
@@ -89,4 +109,23 @@ input SignInInput {
 input RequestEmailChangeInput {
   newEmail: String!
   currentPassword: String!
+}
+
+input UpdateUserProfileInput {
+  username: String
+  nickname: String
+  profileImage: String
+  age: Int
+}
+
+input CommentCreateInput {
+  ideaId: Int!
+  content: String!
+}
+
+input IdeaCreateInput {
+  title: String!
+  content: String!
+  openLevel: Int
+  categoryIds: [Int!]
 }

@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 
 import { AuthModule } from './auth/auth.module'
+import { CategoryModule } from './category/category.module'
+import { CommentModule } from './comment/comment.module'
 import { IdeaModule } from './idea/idea.module'
 import { UserModule } from './user/user.module'
 
@@ -16,9 +18,11 @@ import { UserModule } from './user/user.module'
       playground: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
+    AuthModule,
+    CategoryModule,
+    CommentModule,
     IdeaModule,
     UserModule,
-    AuthModule,
   ],
 })
 export class AppModule {}

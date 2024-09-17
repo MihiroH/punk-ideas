@@ -96,7 +96,7 @@ export class UserService {
   }
 
   async softDeleteWithRelations(id: number): Promise<boolean> {
-    const deletedResources = await this.prismaService.softDeleteWithRelations('user', id, ['ideas'])
+    const deletedResources = await this.prismaService.softDeleteWithRelations('user', id, ['ideas', 'comments'])
 
     return !!deletedResources
   }
