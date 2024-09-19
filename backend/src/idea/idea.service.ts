@@ -4,8 +4,8 @@ import { Prisma } from '@prisma/client'
 import { ResourceNotFoundException } from '@src/common/libs/errors/resourceNotFound.exception'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
-import { GetIdeasArgs } from './dto/getIdeas.args'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
+import { IdeasGetArgs } from './dto/ideasGet.args'
 import { Idea } from './models/idea.model'
 
 @Injectable()
@@ -38,9 +38,9 @@ export class IdeaService {
     }
   }
 
-  async findMany(args?: { getIdeasArgs?: GetIdeasArgs; authorId?: number }, include?: Prisma.IdeaInclude) {
-    const { authorId, getIdeasArgs } = args ?? {}
-    const { title, content, orderBy, ...restFilter } = getIdeasArgs ?? {}
+  async findMany(args?: { ideasGetArgs?: IdeasGetArgs; authorId?: number }, include?: Prisma.IdeaInclude) {
+    const { authorId, ideasGetArgs } = args ?? {}
+    const { title, content, orderBy, ...restArgs } = ideasGetArgs ?? {}
 
     const resources = await this.prismaService.client.idea.findMany({
       where: {
@@ -48,7 +48,7 @@ export class IdeaService {
         title: { contains: title },
         content: { contains: content },
         deletedAt: null,
-        ...restFilter,
+        ...restArgs,
       },
       orderBy: this.prismaService.formatOrderBy(orderBy),
       include,

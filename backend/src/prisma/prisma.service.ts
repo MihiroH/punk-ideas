@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import { Prisma, PrismaClient } from '@prisma/client'
 
 import { SORT_ORDER, VSortOrders } from '@src/common/constants/sortOrder.constant'
-import { OrderByInput } from '@src/common/dto/orderBy.args'
+import { OrderByArgs } from '@src/common/dto/orderBy.args'
 import { ResourceNotFoundException } from '@src/common/libs/errors/resourceNotFound.exception'
 import { CamelCase } from '@src/common/types/string.type'
 import { PRISMA_CLIENT_ERROR_CODE } from './constants/prisma.constant'
@@ -75,7 +75,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     return this.transactionClient ?? this.prismaClient
   }
 
-  formatOrderBy(orderBy: OrderByInput | OrderByInput[], initialOrderBy: Record<string, VSortOrders> = defaultOrderBy) {
+  formatOrderBy(orderBy: OrderByArgs | OrderByArgs[], initialOrderBy: Record<string, VSortOrders> = defaultOrderBy) {
     if (!orderBy) {
       return initialOrderBy
     }

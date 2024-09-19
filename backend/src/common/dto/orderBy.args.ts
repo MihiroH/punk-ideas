@@ -4,7 +4,7 @@ import { IsIn } from 'class-validator'
 import { SORT_ORDER } from '../constants/sortOrder.constant'
 
 @InputType()
-export class OrderByInput {
+export class OrderByArgs {
   @Field()
   field: string
 

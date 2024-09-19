@@ -3,7 +3,7 @@ import { IsOptional } from 'class-validator'
 
 // NOTE: emailとpasswordの変更はここでは許可しない
 @InputType()
-export class UpdateUserProfileInput {
+export class UserProfileUpdateInput {
   @Field({ nullable: true })
   @IsOptional()
   username?: string

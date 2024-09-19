@@ -9,8 +9,8 @@ import { PrismaService } from '@src/prisma/prisma.service'
 import { EmailAlreadyExistsException } from '@src/user/errors/emailAlreadyExists.exception'
 import { User } from '@src/user/models/user.model'
 import { UserService } from '@src/user/user.service'
-import { RequestEmailChangeInput } from './dto/requestEmailChange.input'
-import { SignInResponse } from './dto/signInResponse'
+import { EmailChangeRequestInput } from './dto/emailChangeRequest.input'
+import { SignInResponse } from './dto/signIn.response'
 import { SignUpInput } from './dto/signUp.input'
 import { CustomUnauthorizedException } from './errors/customUnauthorized.exception'
 import { JwtPayload } from './types/jwt.type'
@@ -49,20 +49,20 @@ export class AuthService {
     }
   }
 
-  async requestEmailChange(userId: number, requestEmailChangeInput: RequestEmailChangeInput): Promise<boolean> {
+  async requestEmailChange(userId: number, emailChangeRequestInput: EmailChangeRequestInput): Promise<boolean> {
     const user = await this.userService.findById(userId)
 
-    if (!(await this.isPasswordCorrect(requestEmailChangeInput.currentPassword, user))) {
+    if (!(await this.isPasswordCorrect(emailChangeRequestInput.currentPassword, user))) {
       throw new CustomUnauthorizedException('incorrectPassword')
     }
 
-    if (await this.userService.isEmailExists(requestEmailChangeInput.newEmail)) {
+    if (await this.userService.isEmailExists(emailChangeRequestInput.newEmail)) {
       throw new EmailAlreadyExistsException()
     }
 
-    const emailVerificationToken = this.generateJwtToken(userId, requestEmailChangeInput.newEmail)
+    const emailVerificationToken = this.generateJwtToken(userId, emailChangeRequestInput.newEmail)
     const isEmailSent = await this.mailService.sendEmailChangeVerificationEmail(
-      requestEmailChangeInput.newEmail,
+      emailChangeRequestInput.newEmail,
       emailVerificationToken,
       user.username,
     )
@@ -72,7 +72,7 @@ export class AuthService {
     if (isEmailSent) {
       const pendingEmailChange = await this.pendingEmailChangeService.create(
         userId,
-        requestEmailChangeInput.newEmail,
+        emailChangeRequestInput.newEmail,
         emailVerificationToken,
       )
       isPendingEmailChangeCreated = !!pendingEmailChange
