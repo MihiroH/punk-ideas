@@ -5,8 +5,8 @@ import * as bcrypt from 'bcrypt'
 import { ResourceNotFoundException } from '@src/common/libs/errors/resourceNotFound.exception'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
-import { CreateUserInput } from './dto/createUser.input'
-import { UpdateUserProfileInput } from './dto/updateUser.input'
+import { UserCreateInput } from './dto/userCreate.input'
+import { UserProfileUpdateInput } from './dto/userProfileUpdate.input'
 import { EmailAlreadyExistsException } from './errors/emailAlreadyExists.exception'
 import { User } from './models/user.model'
 
@@ -30,7 +30,7 @@ export class UserService {
     })
   }
 
-  async create(data: CreateUserInput): Promise<User> {
+  async create(data: UserCreateInput): Promise<User> {
     if (await this.isEmailExists(data.email)) {
       throw new EmailAlreadyExistsException()
     }
@@ -61,7 +61,7 @@ export class UserService {
     }
   }
 
-  async updateProfile(id: number, data: UpdateUserProfileInput): Promise<User> {
+  async updateProfile(id: number, data: UserProfileUpdateInput): Promise<User> {
     return await this.update({ where: { id }, data })
   }
 

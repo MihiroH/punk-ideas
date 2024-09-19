@@ -4,7 +4,7 @@ import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator'
 import { IsPasswordValid } from '../validators/password.validation'
 
 @InputType()
-export class CreateUserInput {
+export class UserCreateInput {
   @Field()
   @IsEmail()
   email: string

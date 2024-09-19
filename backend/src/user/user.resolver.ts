@@ -4,7 +4,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { User } from '@src/user/models/user.model'
-import { UpdateUserProfileInput } from './dto/updateUser.input'
+import { UserProfileUpdateInput } from './dto/userProfileUpdate.input'
 import { User as UserModel } from './models/user.model'
 import { UserService } from './user.service'
 
@@ -21,10 +21,10 @@ export class UserResolver {
   @Mutation(() => UserModel)
   @UseGuards(JwtAuthGuard)
   async updateUserProfile(
-    @Args('updateUserProfileInput') updateUserProfileInput: UpdateUserProfileInput,
+    @Args('userProfileUpdateInput') userProfileUpdateInput: UserProfileUpdateInput,
     @CurrentUser() user: User,
   ): Promise<User> {
-    return this.userService.updateProfile(user.id, updateUserProfileInput)
+    return this.userService.updateProfile(user.id, userProfileUpdateInput)
   }
 
   @Mutation(() => Boolean)

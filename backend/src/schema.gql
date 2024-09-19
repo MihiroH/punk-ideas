@@ -72,11 +72,11 @@ type SignInResponse {
 type Query {
   user: User
   categories: [Category!]!
-  ideas(title: String, content: String, openLevel: Int, orderBy: OrderByInput): [Idea!]
+  ideas(title: String, content: String, openLevel: Int, orderBy: OrderByArgs): [Idea!]
   idea(id: Int!): Idea
 }
 
-input OrderByInput {
+input OrderByArgs {
   field: String!
   order: String!
 }
@@ -84,8 +84,8 @@ input OrderByInput {
 type Mutation {
   signUp(signUpInput: SignUpInput!): Boolean!
   signIn(signInInput: SignInInput!): SignInResponse!
-  requestEmailChange(requestEmailChangeInput: RequestEmailChangeInput!): Boolean!
-  updateUserProfile(updateUserProfileInput: UpdateUserProfileInput!): User!
+  requestEmailChange(emailChangeRequestInput: EmailChangeRequestInput!): Boolean!
+  updateUserProfile(userProfileUpdateInput: UserProfileUpdateInput!): User!
   deleteUser: Boolean!
   createComment(commentCreateInput: CommentCreateInput!): Comment!
   createIdea(ideaCreateInput: IdeaCreateInput!): Idea!
@@ -106,12 +106,12 @@ input SignInInput {
   password: String!
 }
 
-input RequestEmailChangeInput {
+input EmailChangeRequestInput {
   newEmail: String!
   currentPassword: String!
 }
 
-input UpdateUserProfileInput {
+input UserProfileUpdateInput {
   username: String
   nickname: String
   profileImage: String

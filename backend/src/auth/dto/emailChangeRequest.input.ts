@@ -4,7 +4,7 @@ import { IsPasswordValid } from '@src/user/validators/password.validation'
 import { IsEmail } from 'class-validator'
 
 @InputType()
-export class RequestEmailChangeInput {
+export class EmailChangeRequestInput {
   @Field()
   @IsEmail()
   newEmail: string

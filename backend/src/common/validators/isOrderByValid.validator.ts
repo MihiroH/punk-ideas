@@ -5,11 +5,12 @@ import {
   ValidatorConstraintInterface,
   registerDecorator,
 } from 'class-validator'
-import { OrderByInput } from '../dto/orderBy.args'
+
+import { OrderByArgs } from '../dto/orderBy.args'
 
 @ValidatorConstraint({ async: true })
 export class IsOrderByFieldValidConstraint implements ValidatorConstraintInterface {
-  validate(orderBy: OrderByInput | OrderByInput[], args: ValidationArguments) {
+  validate(orderBy: OrderByArgs | OrderByArgs[], args: ValidationArguments) {
     const fields = args.constraints
 
     if (Array.isArray(orderBy)) {

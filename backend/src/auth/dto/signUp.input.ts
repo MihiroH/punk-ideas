@@ -1,6 +1,6 @@
 import { InputType } from '@nestjs/graphql'
 
-import { CreateUserInput } from '@src/user/dto/createUser.input'
+import { UserCreateInput } from '@src/user/dto/userCreate.input'
 
 @InputType()
-export class SignUpInput extends CreateUserInput {}
+export class SignUpInput extends UserCreateInput {}

@@ -7,8 +7,8 @@ import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { OptionalJwtAuthGuard } from '@src/auth/guards/optionalJwtAuth.guard'
 import { SORT_ORDER } from '@src/common/constants/sortOrder.constant'
 import { User } from '@src/user/models/user.model'
-import { GetIdeasArgs } from './dto/getIdeas.args'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
+import { IdeasGetArgs } from './dto/ideasGet.args'
 import { IdeaService } from './idea.service'
 import { Idea } from './models/idea.model'
 
@@ -38,12 +38,12 @@ export class IdeaResolver {
 
   @Query(() => [Idea], { nullable: true })
   @UseGuards(OptionalJwtAuthGuard)
-  async ideas(@Args() getIdeasArgs?: GetIdeasArgs, @CurrentUser() user?: User): Promise<Idea[]> {
+  async ideas(@Args() ideasGetArgs?: IdeasGetArgs, @CurrentUser() user?: User): Promise<Idea[]> {
     if (user) {
-      return await this.ideaService.findMany({ getIdeasArgs, authorId: user?.id }, this.relations)
+      return await this.ideaService.findMany({ ideasGetArgs, authorId: user?.id }, this.relations)
     }
 
-    return await this.ideaService.findMany({ getIdeasArgs }, this.relations)
+    return await this.ideaService.findMany({ ideasGetArgs }, this.relations)
   }
 
   @Query(() => Idea, { nullable: true })
