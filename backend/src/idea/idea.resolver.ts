@@ -32,6 +32,16 @@ export class IdeaResolver {
     return await this.ideaService.findMany({ ideasGetArgs }, relations)
   }
 
+  @Query(() => Int)
+  @UseGuards(OptionalJwtAuthGuard)
+  async ideasCount(@Args() ideasGetArgs?: IdeasGetArgs, @CurrentUser() user?: User): Promise<number> {
+    if (user) {
+      return await this.ideaService.count({ ideasGetArgs, authorId: user?.id })
+    }
+
+    return await this.ideaService.count({ ideasGetArgs })
+  }
+
   @Query(() => Idea, { nullable: true })
   async idea(@RequestedFields() requestedFields: string[], @Args('id', { type: () => Int }) id: number): Promise<Idea> {
     const relations = this.ideaService.createRelations(requestedFields)

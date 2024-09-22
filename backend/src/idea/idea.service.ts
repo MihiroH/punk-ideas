@@ -85,6 +85,22 @@ export class IdeaService {
     return resources.map((r) => this.formatIdea(r))
   }
 
+  async count(args?: { ideasGetArgs?: IdeasGetArgs; authorId?: number }): Promise<number> {
+    const { authorId, ideasGetArgs } = args ?? {}
+    const { title, content, orderBy, ...restArgs } = ideasGetArgs ?? {}
+
+    return await this.prismaService.client.idea.count({
+      where: {
+        authorId,
+        title: { contains: title },
+        content: { contains: content },
+        deletedAt: null,
+        ...restArgs,
+      },
+      orderBy: this.prismaService.formatOrderBy(orderBy),
+    })
+  }
+
   async findById(id: number, include?: Prisma.IdeaInclude): Promise<Idea> {
     const resource = await this.prismaService.client.idea.findUniqueOrThrow({
       where: {
