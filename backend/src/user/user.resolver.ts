@@ -3,6 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 
 import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
+import { RequestedFields } from '@src/common/decorators/requestedFields.decorator'
 import { User } from '@src/user/models/user.model'
 import { UserProfileUpdateInput } from './dto/userProfileUpdate.input'
 import { User as UserModel } from './models/user.model'
@@ -14,8 +15,10 @@ export class UserResolver {
 
   @Query(() => UserModel, { nullable: true })
   @UseGuards(JwtAuthGuard)
-  async user(@CurrentUser() user: User): Promise<User> {
-    return this.userService.findById(user.id)
+  async user(@RequestedFields() requestedFields: string[], @CurrentUser() user: User): Promise<User> {
+    const relations = this.userService.createRelations(requestedFields)
+
+    return this.userService.findById(user.id, relations)
   }
 
   @Mutation(() => UserModel)

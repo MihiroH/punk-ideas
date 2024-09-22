@@ -8,7 +8,7 @@ import { User } from '@src/user/models/user.model'
 import { OPEN_LEVELS } from '../constants/idea.constant'
 
 @ObjectType()
-class Count {
+class IdeaRelationsCount {
   @Field(() => Int, { nullable: true })
   comments?: number
 
@@ -42,9 +42,9 @@ export class IdeaRelations {
   @IsOptional()
   categories?: Category[]
 
-  @Field(() => Count, { nullable: true })
+  @Field(() => IdeaRelationsCount, { nullable: true })
   @IsOptional()
-  _count?: Count
+  _count?: IdeaRelationsCount
 }
 
 @ObjectType()
