@@ -35,7 +35,19 @@ type IdeaCategory {
   category: Category!
 }
 
+type Count {
+  comments: Int
+  reports: Int
+}
+
 type Idea {
+  author: User
+  comments: [Comment!]
+  commentsCount: Int
+  reportsCount: Int
+  ideaCategories: [IdeaCategory!]
+  categories: [Category!]
+  _count: Count
   id: Int!
   authorId: Int!
   title: String!
@@ -44,10 +56,6 @@ type Idea {
   createdAt: DateTime!
   updatedAt: DateTime!
   deletedAt: DateTime
-  author: User
-  comments: [Comment!]
-  ideaCategories: [IdeaCategory!]
-  categories: [Category!]
 }
 
 type User {
@@ -73,6 +81,7 @@ type Query {
   user: User
   categories: [Category!]!
   ideas(title: String, content: String, openLevel: Int, orderBy: OrderByArgs): [Idea!]
+  ideasCount(title: String, content: String, openLevel: Int, orderBy: OrderByArgs): Int!
   idea(id: Int!): Idea
 }
 

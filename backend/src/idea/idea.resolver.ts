@@ -5,7 +5,7 @@ import { Request } from 'express'
 import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { OptionalJwtAuthGuard } from '@src/auth/guards/optionalJwtAuth.guard'
-import { SORT_ORDER } from '@src/common/constants/sortOrder.constant'
+import { RequestedFields } from '@src/common/decorators/requestedFields.decorator'
 import { User } from '@src/user/models/user.model'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
 import { IdeasGetArgs } from './dto/ideasGet.args'
@@ -14,41 +14,29 @@ import { Idea } from './models/idea.model'
 
 @Resolver()
 export class IdeaResolver {
-  private relations = {
-    author: true,
-    comments: {
-      where: {
-        deletedAt: null,
-      },
-      orderBy: {
-        createdAt: SORT_ORDER.desc,
-      },
-      include: {
-        author: true,
-      },
-    },
-    ideaCategories: {
-      include: {
-        category: true,
-      },
-    },
-  }
-
   constructor(private ideaService: IdeaService) {}
 
   @Query(() => [Idea], { nullable: true })
   @UseGuards(OptionalJwtAuthGuard)
-  async ideas(@Args() ideasGetArgs?: IdeasGetArgs, @CurrentUser() user?: User): Promise<Idea[]> {
+  async ideas(
+    @RequestedFields() requestedFields: string[],
+    @Args() ideasGetArgs?: IdeasGetArgs,
+    @CurrentUser() user?: User,
+  ): Promise<Idea[]> {
+    const relations = this.ideaService.createRelations(requestedFields)
+
     if (user) {
-      return await this.ideaService.findMany({ ideasGetArgs, authorId: user?.id }, this.relations)
+      return await this.ideaService.findMany({ ideasGetArgs, authorId: user?.id }, relations)
     }
 
-    return await this.ideaService.findMany({ ideasGetArgs }, this.relations)
+    return await this.ideaService.findMany({ ideasGetArgs }, relations)
   }
 
   @Query(() => Idea, { nullable: true })
-  async idea(@Args('id', { type: () => Int }) id: number): Promise<Idea> {
-    return await this.ideaService.findById(id, this.relations)
+  async idea(@RequestedFields() requestedFields: string[], @Args('id', { type: () => Int }) id: number): Promise<Idea> {
+    const relations = this.ideaService.createRelations(requestedFields)
+
+    return await this.ideaService.findById(id, relations)
   }
 
   @Mutation(() => Idea)

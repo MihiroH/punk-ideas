@@ -1,6 +1,5 @@
 import { ValidationPipe } from '@nestjs/common'
-
-import { CustomBadRequestException } from './errors/customBadRequest.exception'
+import { CustomBadRequestException } from '../errors/customBadRequest.exception'
 
 export class AppValidationPipe extends ValidationPipe {
   constructor() {

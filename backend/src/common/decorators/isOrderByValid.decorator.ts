@@ -6,10 +6,10 @@ import {
   registerDecorator,
 } from 'class-validator'
 
-import { OrderByArgs } from '../dto/orderBy.args'
+import { OrderByArgs } from '@src/common/dto/orderBy.args'
 
 @ValidatorConstraint({ async: true })
-export class IsOrderByFieldValidConstraint implements ValidatorConstraintInterface {
+class IsOrderByFieldValidConstraint implements ValidatorConstraintInterface {
   validate(orderBy: OrderByArgs | OrderByArgs[], args: ValidationArguments) {
     const fields = args.constraints
 

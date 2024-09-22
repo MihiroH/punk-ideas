@@ -28,8 +28,7 @@ export class Comment {
   updatedAt: Date
 
   @Field({ nullable: true })
-  @IsOptional()
-  deletedAt?: Date
+  deletedAt: Date | null
 
   @Field(() => User, { nullable: true })
   @IsOptional()
