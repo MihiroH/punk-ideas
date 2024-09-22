@@ -4,12 +4,19 @@ import { Prisma } from '@prisma/client'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
+import { FIELD_RELATIONS } from './constants/idea.constant'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
 import { IdeasGetArgs } from './dto/ideasGet.args'
-import { Idea } from './models/idea.model'
+import { Idea, IdeaRelations } from './models/idea.model'
 
 @Injectable()
 export class IdeaService {
+  readonly FIELD_RELATIONS = FIELD_RELATIONS
+  private readonly COUNT_KEY_FIELD_MAP = {
+    comments: 'commentsCount',
+    reports: 'reportsCount',
+  }
+
   constructor(private prismaService: PrismaService) {}
 
   async create(data: IdeaCreateInput, authorId: number, authorIp: string): Promise<Idea> {
@@ -31,14 +38,35 @@ export class IdeaService {
     })
   }
 
-  formatIdea(idea: Idea): Idea {
-    return {
-      ...idea,
-      categories: idea.ideaCategories?.map((category) => category.category),
-    }
+  createRelations(fields: Parameters<PrismaService['createRelations']>[0], fieldRelations = this.FIELD_RELATIONS) {
+    return this.prismaService.createRelations<'idea', keyof IdeaRelations>(fields, fieldRelations)
   }
 
-  async findMany(args?: { ideasGetArgs?: IdeasGetArgs; authorId?: number }, include?: Prisma.IdeaInclude) {
+  formatIdea(idea: Idea | null): Idea | null {
+    if (!idea) {
+      return null
+    }
+
+    const result = { ...idea }
+
+    if ('ideaCategories' in idea) {
+      result.categories = idea.ideaCategories?.map((category) => category.category) ?? null
+    }
+
+    if (idea._count) {
+      for (const [key, value] of Object.entries(idea._count)) {
+        const field = this.COUNT_KEY_FIELD_MAP[key]
+        result[field] = value
+      }
+    }
+
+    return result
+  }
+
+  async findMany(
+    args?: { ideasGetArgs?: IdeasGetArgs; authorId?: number },
+    include?: Prisma.IdeaInclude,
+  ): Promise<Idea[]> {
     const { authorId, ideasGetArgs } = args ?? {}
     const { title, content, orderBy, ...restArgs } = ideasGetArgs ?? {}
 
@@ -54,7 +82,7 @@ export class IdeaService {
       include,
     })
 
-    return resources.map(this.formatIdea)
+    return resources.map((r) => this.formatIdea(r))
   }
 
   async findById(id: number, include?: Prisma.IdeaInclude): Promise<Idea> {
