@@ -40,8 +40,7 @@ export class User {
   updatedAt: Date
 
   @Field({ nullable: true })
-  @IsOptional()
-  deletedAt?: Date
+  deletedAt: Date | null
 
   @Field(() => [Idea], { nullable: true })
   @IsOptional()

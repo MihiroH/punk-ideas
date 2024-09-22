@@ -1,8 +1,8 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql'
 import { IsIn, IsOptional } from 'class-validator'
 
+import { IsOrderByFieldValid } from '@src/common/decorators/isOrderByValid.decorator'
 import { OrderByArgs } from '@src/common/dto/orderBy.args'
-import { IsOrderByFieldValid } from '@src/common/validators/isOrderByValid.validator'
 import { OPEN_LEVELS } from '../constants/idea.constant'
 
 @ArgsType()

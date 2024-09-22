@@ -8,7 +8,47 @@ import { User } from '@src/user/models/user.model'
 import { OPEN_LEVELS } from '../constants/idea.constant'
 
 @ObjectType()
-export class Idea {
+class Count {
+  @Field(() => Int, { nullable: true })
+  comments?: number
+
+  @Field(() => Int, { nullable: true })
+  reports?: number
+}
+
+@ObjectType()
+export class IdeaRelations {
+  @Field(() => User, { nullable: true })
+  @IsOptional()
+  author?: User
+
+  @Field(() => [Comment], { nullable: true })
+  @IsOptional()
+  comments?: Comment[]
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  commentsCount?: number
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  reportsCount?: number
+
+  @Field(() => [IdeaCategory], { nullable: true })
+  @IsOptional()
+  ideaCategories?: IdeaCategory[]
+
+  @Field(() => [Category], { nullable: true })
+  @IsOptional()
+  categories?: Category[]
+
+  @Field(() => Count, { nullable: true })
+  @IsOptional()
+  _count?: Count
+}
+
+@ObjectType()
+export class Idea extends IdeaRelations {
   @Field(() => Int)
   id: number
 
@@ -35,22 +75,5 @@ export class Idea {
   updatedAt: Date
 
   @Field({ nullable: true })
-  @IsOptional()
-  deletedAt?: Date
-
-  @Field(() => User, { nullable: true })
-  @IsOptional()
-  author?: User
-
-  @Field(() => [Comment], { nullable: true })
-  @IsOptional()
-  comments?: Comment[]
-
-  @Field(() => [IdeaCategory], { nullable: true })
-  @IsOptional()
-  ideaCategories?: IdeaCategory[]
-
-  @Field(() => [Category], { nullable: true })
-  @IsOptional()
-  categories?: Category[]
+  deletedAt: Date | null
 }

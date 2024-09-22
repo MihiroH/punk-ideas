@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql'
 
-import { IsPasswordValid } from '@src/user/validators/password.validation'
+import { IsPasswordValid } from '@src/user/decorators/isPasswordValid.decorator'
 import { IsEmail } from 'class-validator'
 
 @InputType()

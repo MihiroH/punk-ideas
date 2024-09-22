@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 
-import { ResourceNotFoundException } from '@src/common/libs/errors/resourceNotFound.exception'
+import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
 import { IdeaCreateInput } from './dto/ideaCreate.input'

@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 
-import { AppValidationPipe } from './common/libs/appValidation.pipe'
-import { CustomExceptionFilter } from './common/libs/filters/customException.filter'
+import { CustomExceptionFilter } from './common/filters/customException.filter'
+import { AppValidationPipe } from './common/pipes/appValidation.pipe'
 import { PrismaClientExceptionFilter } from './prisma/filters/prismaClientException.filter'
 
 async function bootstrap() {

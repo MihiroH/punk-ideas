@@ -3,16 +3,10 @@ import { Prisma, PrismaClient } from '@prisma/client'
 
 import { SORT_ORDER, VSortOrders } from '@src/common/constants/sortOrder.constant'
 import { OrderByArgs } from '@src/common/dto/orderBy.args'
-import { ResourceNotFoundException } from '@src/common/libs/errors/resourceNotFound.exception'
-import { CamelCase } from '@src/common/types/string.type'
+import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
+import { deepMergeObjects } from '@src/common/helpers/deepMergeObjects.helper'
 import { PRISMA_CLIENT_ERROR_CODE } from './constants/prisma.constant'
-
-type ModelDelegateForUpdate = PrismaClient[keyof PrismaClient] & {
-  update(args: { where: { id: number }; data: object }): Prisma.PrismaPromise<unknown>
-}
-type ModelName = keyof Prisma.TypeMap['model']
-type CamelCasedModelName = CamelCase<ModelName>
-type Relations<T extends ModelName> = keyof Prisma.TypeMap['model'][T]['payload']['objects']
+import { CamelCasedModelName, ModelDelegateForUpdate, PrismaInclude, Relations } from './types/prisma.type'
 
 const defaultOrderBy = {
   createdAt: SORT_ORDER.desc,
@@ -92,10 +86,10 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async softDeleteWithRelations<T extends CamelCasedModelName = CamelCasedModelName>(
-    modelName: T,
+  async softDeleteWithRelations<ModelName extends CamelCasedModelName = CamelCasedModelName>(
+    modelName: ModelName,
     id: number,
-    relations: Relations<Capitalize<T>>[],
+    relations: Relations<Capitalize<ModelName>>[],
   ) {
     const relationsQuery = relations.reduce((acc, relation) => {
       acc[String(relation)] = {
