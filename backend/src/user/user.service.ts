@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
+import { strictEntries } from '@src/common/helpers/strictEntries.helper'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
 import { FIELD_RELATIONS } from './constants/user.constant'
@@ -18,7 +19,7 @@ export class UserService {
     ideas: 'ideasCount',
     comments: 'commentsCount',
     reports: 'reportsCount',
-  }
+  } as const
 
   constructor(private prismaService: PrismaService) {}
 
@@ -26,15 +27,11 @@ export class UserService {
     return this.prismaService.createRelations<'idea', keyof UserRelations>(fields, fieldRelations)
   }
 
-  formatUser(user: User | null): User | null {
-    if (!user) {
-      return null
-    }
-
+  formatUser(user: User): User {
     const result = { ...user }
 
     if (user._count) {
-      for (const [key, value] of Object.entries(user._count)) {
+      for (const [key, value] of strictEntries(user._count)) {
         const field = this.COUNT_KEY_FIELD_MAP[key]
         result[field] = value
       }
@@ -43,7 +40,7 @@ export class UserService {
     return result
   }
 
-  async findByEmail(email: string, includeDeleted = false, include?: Prisma.UserInclude): Promise<User> {
+  async findByEmail(email: string, includeDeleted = false, include?: Prisma.UserInclude): Promise<User | null> {
     const resource = await this.prismaService.client.user.findUnique({
       where: {
         email,
@@ -52,16 +49,19 @@ export class UserService {
       include,
     })
 
-    return this.formatUser(resource)
+    return resource ? this.formatUser(resource) : null
   }
 
-  async findById(id: number, include?: Prisma.UserInclude): Promise<User> {
-    const resource = await this.prismaService.client.user.findUniqueOrThrow({
-      where: { id, deletedAt: null },
+  async findById(id: number, include?: Prisma.UserInclude): Promise<User | null> {
+    const resource = await this.prismaService.client.user.findUnique({
+      where: {
+        id,
+        deletedAt: null,
+      },
       include,
     })
 
-    return this.formatUser(resource)
+    return resource ? this.formatUser(resource) : null
   }
 
   async create(data: UserCreateInput): Promise<User> {
@@ -108,7 +108,8 @@ export class UserService {
   }
 
   async isEmailExists(email: string): Promise<boolean> {
-    return !!(await this.findByEmail(email, true))
+    const user = await this.findByEmail(email, true)
+    return !!user
   }
 
   async verify(id: number): Promise<boolean> {

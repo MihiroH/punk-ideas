@@ -13,7 +13,7 @@ export class UserCreateInput {
   @IsNotEmpty()
   username: string
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
   nickname?: string
 
@@ -21,7 +21,7 @@ export class UserCreateInput {
   @IsPasswordValid()
   password: string
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
   profileImage?: string
 

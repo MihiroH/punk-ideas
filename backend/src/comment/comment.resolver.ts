@@ -20,6 +20,6 @@ export class CommentResolver {
     @Context() { req }: { req: Request },
     @CurrentUser() user: User,
   ): Promise<Comment> {
-    return await this.commentService.create(commentCreateInput, user.id, req.ip)
+    return await this.commentService.create(commentCreateInput, user.id, req.ip ?? '')
   }
 }

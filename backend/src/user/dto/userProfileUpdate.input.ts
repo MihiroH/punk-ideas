@@ -4,15 +4,15 @@ import { IsOptional } from 'class-validator'
 // NOTE: emailとpasswordの変更はここでは許可しない
 @InputType()
 export class UserProfileUpdateInput {
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
   username?: string
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
   nickname?: string
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
   profileImage?: string
 

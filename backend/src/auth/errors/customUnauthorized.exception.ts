@@ -5,7 +5,7 @@ export class CustomUnauthorizedException extends Error {
 
   constructor(
     code: keyof typeof UNAUTHORIZED_ERROR_MESSAGE,
-    message = UNAUTHORIZED_ERROR_MESSAGE[code] ?? 'Unauthorized',
+    message: string = UNAUTHORIZED_ERROR_MESSAGE[code] ?? 'Unauthorized',
   ) {
     super(message)
     this.name = 'CustomUnauthorizedException'

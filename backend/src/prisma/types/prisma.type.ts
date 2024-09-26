@@ -12,9 +12,9 @@ export type PrismaClientError =
 export type ModelDelegateForUpdate = PrismaClient[keyof PrismaClient] & {
   update(args: { where: { id: number }; data: object }): Prisma.PrismaPromise<unknown>
 }
-export type ModelName = keyof Prisma.TypeMap['model']
-export type CamelCasedModelName = CamelCase<ModelName>
-export type Relations<M extends ModelName> = keyof Prisma.TypeMap['model'][M]['payload']['objects']
+export type CapitalizedModelName = keyof Prisma.TypeMap['model']
+export type CamelCasedModelName = CamelCase<CapitalizedModelName>
+export type RelationNames<M extends CapitalizedModelName> = keyof Prisma.TypeMap['model'][M]['payload']['objects']
 
 // biome-ignore format:
 export type PrismaInclude<M extends CamelCasedModelName> =
