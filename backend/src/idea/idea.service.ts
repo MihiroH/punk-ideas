@@ -45,6 +45,7 @@ export class IdeaService {
     const resource = await this.prismaService.client.idea.create({
       data: {
         ...restData,
+        authorId,
         authorIp: Buffer.from(authorIp),
         ideaCategories: {
           create: categoryIds?.map((categoryId) => ({
@@ -52,9 +53,6 @@ export class IdeaService {
               connect: { id: categoryId },
             },
           })),
-        },
-        author: {
-          connect: { id: authorId },
         },
       },
       include: {
