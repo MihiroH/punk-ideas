@@ -2,6 +2,13 @@ import { Prisma, PrismaClient } from '@prisma/client'
 
 import { CamelCase } from '@src/common/types/string.type'
 
+export type PrismaClientError =
+  | Prisma.PrismaClientKnownRequestError
+  | Prisma.PrismaClientUnknownRequestError
+  | Prisma.PrismaClientRustPanicError
+  | Prisma.PrismaClientInitializationError
+  | Prisma.PrismaClientValidationError
+
 export type ModelDelegateForUpdate = PrismaClient[keyof PrismaClient] & {
   update(args: { where: { id: number }; data: object }): Prisma.PrismaPromise<unknown>
 }
