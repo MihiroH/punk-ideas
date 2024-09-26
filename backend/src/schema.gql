@@ -91,9 +91,9 @@ type SignInResponse {
 type Query {
   user: User
   categories: [Category!]!
-  ideas(title: String, content: String, openLevel: Int, orderBy: OrderByArgs): [Idea!]
-  ideasCount(title: String, content: String, openLevel: Int, orderBy: OrderByArgs): Int!
-  idea(id: Int!): Idea
+  ideas(title: String, content: String, openLevel: Int, orderBy: [OrderByArgs!], includeReportedBySelf: Boolean): [Idea!]
+  ideasCount(title: String, content: String, openLevel: Int, orderBy: [OrderByArgs!], includeReportedBySelf: Boolean): Int!
+  idea(id: Int!): Idea!
 }
 
 input OrderByArgs {

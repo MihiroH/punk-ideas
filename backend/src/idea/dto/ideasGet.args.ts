@@ -24,4 +24,8 @@ export class IdeasGetArgs {
   @IsOptional()
   @IsOrderByFieldValid(['id', 'title', 'content', 'openLevel', 'createdAt', 'updatedAt'])
   orderBy?: OrderByArgs[]
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  includeReportedBySelf?: boolean
 }
