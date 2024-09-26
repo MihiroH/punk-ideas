@@ -41,7 +41,7 @@ export class AuthController {
       throw new CustomUnauthorizedException('invalidToken', error)
     }
 
-    const pendingEmailChange = await this.pendingEmailChangeService.findByUserIdAndToken(decoded.sub, token)
+    const pendingEmailChange = await this.pendingEmailChangeService.getByUserIdAndToken(decoded.sub, token)
 
     if (!pendingEmailChange || pendingEmailChange.email !== decoded.email) {
       throw new CustomUnauthorizedException('invalidToken')

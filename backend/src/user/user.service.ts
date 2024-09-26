@@ -40,7 +40,7 @@ export class UserService {
     return result
   }
 
-  async findByEmail(email: string, includeDeleted = false, include?: Prisma.UserInclude): Promise<User | null> {
+  async getByEmail(email: string, includeDeleted = false, include?: Prisma.UserInclude): Promise<User | null> {
     const resource = await this.prismaService.client.user.findUnique({
       where: {
         email,
@@ -52,7 +52,7 @@ export class UserService {
     return resource ? this.formatUser(resource) : null
   }
 
-  async findById(id: number, include?: Prisma.UserInclude): Promise<User | null> {
+  async getById(id: number, include?: Prisma.UserInclude): Promise<User | null> {
     const resource = await this.prismaService.client.user.findUnique({
       where: {
         id,
@@ -108,7 +108,7 @@ export class UserService {
   }
 
   async isEmailExists(email: string): Promise<boolean> {
-    const user = await this.findByEmail(email, true)
+    const user = await this.getByEmail(email, true)
     return !!user
   }
 
@@ -130,7 +130,7 @@ export class UserService {
     return newUser.email === newEmail && newUser.emailVerifiedAt !== null
   }
 
-  async softDeleteWithRelations(id: number): Promise<boolean> {
+  async deleteWithRelations(id: number): Promise<boolean> {
     const deletedResources = await this.prismaService.softDeleteWithRelations('user', id, ['ideas', 'comments'])
 
     return !!deletedResources

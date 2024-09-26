@@ -3,7 +3,7 @@ import { Args, Context, Mutation, Resolver } from '@nestjs/graphql'
 
 import { User } from '@src/user/models/user.model'
 import { AuthService } from './auth.service'
-import { CurrentUser } from './decorators/currentUser.decorator'
+import { AuthenticatedUser } from './decorators/currentUser.decorator'
 import { EmailChangeRequestInput } from './dto/emailChangeRequest.input'
 import { SignInInput } from './dto/signIn.input'
 import { SignInResponse } from './dto/signIn.response'
@@ -35,7 +35,7 @@ export class AuthResolver {
   @UseGuards(JwtAuthGuard)
   async requestEmailChange(
     @Args('emailChangeRequestInput') emailChangeRequestInput: EmailChangeRequestInput,
-    @CurrentUser() user: User,
+    @AuthenticatedUser() user: User,
   ): Promise<boolean> {
     return this.authService.requestEmailChange(user.id, emailChangeRequestInput)
   }

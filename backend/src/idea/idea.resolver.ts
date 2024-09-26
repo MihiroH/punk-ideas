@@ -2,7 +2,7 @@ import { UseGuards } from '@nestjs/common'
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { Request } from 'express'
 
-import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
+import { AuthenticatedUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { OptionalJwtAuthGuard } from '@src/auth/guards/optionalJwtAuth.guard'
 import { RequestedFields } from '@src/common/decorators/requestedFields.decorator'
@@ -23,7 +23,7 @@ export class IdeaResolver {
   async ideas(
     @RequestedFields() requestedFields: string[],
     @Args() ideasGetArgs?: IdeasGetArgs,
-    @CurrentUser() user?: User,
+    @AuthenticatedUser() user?: User,
   ): Promise<Idea[]> {
     if (ideasGetArgs?.includeReportedBySelf === false && user?.id === undefined) {
       throw new CustomBadRequestException([
@@ -37,15 +37,15 @@ export class IdeaResolver {
     const relations = this.ideaService.createRelations(requestedFields)
 
     if (user) {
-      return await this.ideaService.findMany({ ideasGetArgs, userId: user?.id }, relations)
+      return await this.ideaService.list({ ideasGetArgs, userId: user?.id }, relations)
     }
 
-    return await this.ideaService.findMany({ ideasGetArgs }, relations)
+    return await this.ideaService.list({ ideasGetArgs }, relations)
   }
 
   @Query(() => Int)
   @UseGuards(OptionalJwtAuthGuard)
-  async ideasCount(@Args() ideasGetArgs?: IdeasGetArgs, @CurrentUser() user?: User): Promise<number> {
+  async ideasCount(@Args() ideasGetArgs?: IdeasGetArgs, @AuthenticatedUser() user?: User): Promise<number> {
     if (ideasGetArgs?.includeReportedBySelf === false && user?.id === undefined) {
       throw new CustomBadRequestException([
         {
@@ -65,7 +65,7 @@ export class IdeaResolver {
   @Query(() => Idea)
   async idea(@RequestedFields() requestedFields: string[], @Args('id', { type: () => Int }) id: number): Promise<Idea> {
     const relations = this.ideaService.createRelations(requestedFields)
-    const resource = await this.ideaService.findById(id, relations)
+    const resource = await this.ideaService.getById(id, relations)
 
     if (!resource) {
       throw new ResourceNotFoundException(`Idea not found with the provided id: ${id}`)
@@ -79,7 +79,7 @@ export class IdeaResolver {
   async createIdea(
     @Args('ideaCreateInput') ideaCreateInput: IdeaCreateInput,
     @Context() { req }: { req: Request },
-    @CurrentUser() user: User,
+    @AuthenticatedUser() user: User,
   ): Promise<Idea> {
     return await this.ideaService.create(ideaCreateInput, user.id, req.ip ?? '')
   }
@@ -87,6 +87,6 @@ export class IdeaResolver {
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard)
   async deleteIdea(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
-    return await this.ideaService.softDelete(id)
+    return await this.ideaService.delete(id)
   }
 }

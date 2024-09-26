@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 
-import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
+import { AuthenticatedUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { RequestedFields } from '@src/common/decorators/requestedFields.decorator'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
@@ -15,9 +15,9 @@ export class UserResolver {
 
   @Query(() => User)
   @UseGuards(JwtAuthGuard)
-  async user(@RequestedFields() requestedFields: string[], @CurrentUser() user: User): Promise<User> {
+  async user(@RequestedFields() requestedFields: string[], @AuthenticatedUser() user: User): Promise<User> {
     const relations = this.userService.createRelations(requestedFields)
-    const resource = await this.userService.findById(user.id, relations)
+    const resource = await this.userService.getById(user.id, relations)
 
     if (!resource) {
       throw new ResourceNotFoundException(`User not found with the provided id: ${user.id}`)
@@ -30,14 +30,14 @@ export class UserResolver {
   @UseGuards(JwtAuthGuard)
   async updateUserProfile(
     @Args('userProfileUpdateInput') userProfileUpdateInput: UserProfileUpdateInput,
-    @CurrentUser() user: User,
+    @AuthenticatedUser() user: User,
   ): Promise<User> {
     return await this.userService.updateProfile(user.id, userProfileUpdateInput)
   }
 
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard)
-  async deleteUser(@CurrentUser() user: User): Promise<boolean> {
-    return await this.userService.softDeleteWithRelations(user.id)
+  async deleteUser(@AuthenticatedUser() user: User): Promise<boolean> {
+    return await this.userService.deleteWithRelations(user.id)
   }
 }
