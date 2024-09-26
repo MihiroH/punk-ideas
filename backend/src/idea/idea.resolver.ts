@@ -6,6 +6,7 @@ import { CurrentUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { OptionalJwtAuthGuard } from '@src/auth/guards/optionalJwtAuth.guard'
 import { RequestedFields } from '@src/common/decorators/requestedFields.decorator'
+import { CustomBadRequestException } from '@src/common/errors/customBadRequest.exception'
 import { User } from '@src/user/models/user.model'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
 import { IdeasGetArgs } from './dto/ideasGet.args'
@@ -23,10 +24,19 @@ export class IdeaResolver {
     @Args() ideasGetArgs?: IdeasGetArgs,
     @CurrentUser() user?: User,
   ): Promise<Idea[]> {
+    if (ideasGetArgs.includeReportedBySelf === false && user?.id === undefined) {
+      throw new CustomBadRequestException([
+        {
+          field: 'includeReportedBySelf',
+          error: 'Authorization Bearer token is required if includeReportedBySelf is false',
+        },
+      ])
+    }
+
     const relations = this.ideaService.createRelations(requestedFields)
 
     if (user) {
-      return await this.ideaService.findMany({ ideasGetArgs, authorId: user?.id }, relations)
+      return await this.ideaService.findMany({ ideasGetArgs, userId: user?.id }, relations)
     }
 
     return await this.ideaService.findMany({ ideasGetArgs }, relations)
@@ -35,8 +45,17 @@ export class IdeaResolver {
   @Query(() => Int)
   @UseGuards(OptionalJwtAuthGuard)
   async ideasCount(@Args() ideasGetArgs?: IdeasGetArgs, @CurrentUser() user?: User): Promise<number> {
+    if (ideasGetArgs.includeReportedBySelf === false && user?.id === undefined) {
+      throw new CustomBadRequestException([
+        {
+          field: 'includeReportedBySelf',
+          error: 'Authorization Bearer token is required if includeReportedBySelf is false',
+        },
+      ])
+    }
+
     if (user) {
-      return await this.ideaService.count({ ideasGetArgs, authorId: user?.id })
+      return await this.ideaService.count({ ideasGetArgs, userId: user?.id })
     }
 
     return await this.ideaService.count({ ideasGetArgs })

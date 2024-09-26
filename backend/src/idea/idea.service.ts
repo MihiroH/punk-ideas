@@ -64,18 +64,25 @@ export class IdeaService {
   }
 
   async findMany(
-    args?: { ideasGetArgs?: IdeasGetArgs; authorId?: number },
+    args?: { ideasGetArgs?: IdeasGetArgs; userId?: number },
     include?: Prisma.IdeaInclude,
   ): Promise<Idea[]> {
-    const { authorId, ideasGetArgs } = args ?? {}
-    const { title, content, orderBy, ...restArgs } = ideasGetArgs ?? {}
+    const { ideasGetArgs, userId } = args ?? {}
+    const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
 
     const resources = await this.prismaService.client.idea.findMany({
       where: {
-        authorId,
         title: { contains: title },
         content: { contains: content },
         deletedAt: null,
+        reports:
+          includeReportedBySelf || userId === undefined
+            ? undefined
+            : {
+                none: {
+                  reporterId: userId,
+                },
+              },
         ...restArgs,
       },
       orderBy: this.prismaService.formatOrderBy(orderBy),
@@ -85,16 +92,23 @@ export class IdeaService {
     return resources.map((r) => this.formatIdea(r))
   }
 
-  async count(args?: { ideasGetArgs?: IdeasGetArgs; authorId?: number }): Promise<number> {
-    const { authorId, ideasGetArgs } = args ?? {}
-    const { title, content, orderBy, ...restArgs } = ideasGetArgs ?? {}
+  async count(args?: { ideasGetArgs?: IdeasGetArgs; userId?: number }): Promise<number> {
+    const { userId, ideasGetArgs } = args ?? {}
+    const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
 
     return await this.prismaService.client.idea.count({
       where: {
-        authorId,
         title: { contains: title },
         content: { contains: content },
         deletedAt: null,
+        reports:
+          includeReportedBySelf || userId === undefined
+            ? undefined
+            : {
+                none: {
+                  reporterId: userId,
+                },
+              },
         ...restArgs,
       },
       orderBy: this.prismaService.formatOrderBy(orderBy),
