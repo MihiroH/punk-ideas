@@ -3,9 +3,12 @@ pre-commit:
     frontend-linter:
       root: frontend/
       run: npm run check
+      stage_fixed: true
     backend-linter:
       root: backend/
       run: npm run check
+      stage_fixed: true
     backend-prisma-linter:
       root: backend/
       run: npm run format:prisma
+      stage_fixed: true
