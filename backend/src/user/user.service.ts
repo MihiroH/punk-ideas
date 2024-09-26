@@ -5,29 +5,63 @@ import * as bcrypt from 'bcrypt'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
+import { FIELD_RELATIONS } from './constants/user.constant'
 import { UserCreateInput } from './dto/userCreate.input'
 import { UserProfileUpdateInput } from './dto/userProfileUpdate.input'
 import { EmailAlreadyExistsException } from './errors/emailAlreadyExists.exception'
-import { User } from './models/user.model'
+import { User, UserRelations } from './models/user.model'
 
 @Injectable()
 export class UserService {
-  constructor(private prismaService: PrismaService) {}
-
-  async findByEmail(email: string, excludeDeleted = true): Promise<User> {
-    return await this.prismaService.client.user.findUnique({
-      where: {
-        email,
-        deletedAt: excludeDeleted ? null : undefined,
-      },
-    })
+  readonly FIELD_RELATIONS = FIELD_RELATIONS
+  private readonly COUNT_KEY_FIELD_MAP = {
+    ideas: 'ideasCount',
+    comments: 'commentsCount',
+    reports: 'reportsCount',
   }
 
-  async findById(id: number): Promise<User> {
-    return await this.prismaService.client.user.findUniqueOrThrow({
-      where: { id, deletedAt: null },
-      include: { ideas: { where: { deletedAt: null } } },
+  constructor(private prismaService: PrismaService) {}
+
+  createRelations(fields: Parameters<PrismaService['createRelations']>[0], fieldRelations = this.FIELD_RELATIONS) {
+    return this.prismaService.createRelations<'idea', keyof UserRelations>(fields, fieldRelations)
+  }
+
+  formatUser(user: User | null): User | null {
+    if (!user) {
+      return null
+    }
+
+    const result = { ...user }
+
+    if (user._count) {
+      for (const [key, value] of Object.entries(user._count)) {
+        const field = this.COUNT_KEY_FIELD_MAP[key]
+        result[field] = value
+      }
+    }
+
+    return result
+  }
+
+  async findByEmail(email: string, includeDeleted = false, include?: Prisma.UserInclude): Promise<User> {
+    const resource = await this.prismaService.client.user.findUnique({
+      where: {
+        email,
+        deletedAt: includeDeleted ? undefined : null,
+      },
+      include,
     })
+
+    return this.formatUser(resource)
+  }
+
+  async findById(id: number, include?: Prisma.UserInclude): Promise<User> {
+    const resource = await this.prismaService.client.user.findUniqueOrThrow({
+      where: { id, deletedAt: null },
+      include,
+    })
+
+    return this.formatUser(resource)
   }
 
   async create(data: UserCreateInput): Promise<User> {
@@ -74,7 +108,7 @@ export class UserService {
   }
 
   async isEmailExists(email: string): Promise<boolean> {
-    return !!(await this.findByEmail(email, false))
+    return !!(await this.findByEmail(email, true))
   }
 
   async verify(id: number): Promise<boolean> {
