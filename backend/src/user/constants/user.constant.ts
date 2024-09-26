@@ -25,7 +25,11 @@ export const FIELD_RELATIONS: Array<{
     relations: {
       _count: {
         select: {
-          ideas: true,
+          ideas: {
+            where: {
+              deletedAt: null,
+            },
+          },
         },
       },
     },
@@ -48,7 +52,11 @@ export const FIELD_RELATIONS: Array<{
     relations: {
       _count: {
         select: {
-          comments: true,
+          comments: {
+            where: {
+              deletedAt: null,
+            },
+          },
         },
       },
     },
