@@ -20,8 +20,8 @@ export class IdeasGetArgs {
   @IsIn(Object.values(OPEN_LEVELS), { message: `openLevel must be either ${Object.values(OPEN_LEVELS).join(', ')}` })
   openLevel?: number
 
-  @Field(() => OrderByArgs || [OrderByArgs], { nullable: true })
+  @Field(() => [OrderByArgs], { nullable: true })
   @IsOptional()
   @IsOrderByFieldValid(['id', 'title', 'content', 'openLevel', 'createdAt', 'updatedAt'])
-  orderBy?: OrderByArgs | OrderByArgs[]
+  orderBy?: OrderByArgs[]
 }
