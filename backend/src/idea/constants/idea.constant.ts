@@ -25,6 +25,11 @@ export const FIELD_RELATIONS: Array<{
         include: {
           category: true,
         },
+        orderBy: {
+          category: {
+            id: SORT_ORDER.asc,
+          },
+        },
       },
     },
   },
