@@ -52,6 +52,10 @@ export class AuthService {
   async requestEmailChange(userId: number, emailChangeRequestInput: EmailChangeRequestInput): Promise<boolean> {
     const user = await this.userService.findById(userId)
 
+    if (!user) {
+      throw new CustomUnauthorizedException('userNotFound')
+    }
+
     if (!(await this.isPasswordCorrect(emailChangeRequestInput.currentPassword, user))) {
       throw new CustomUnauthorizedException('incorrectPassword')
     }

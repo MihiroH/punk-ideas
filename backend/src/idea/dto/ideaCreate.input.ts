@@ -1,5 +1,5 @@
 import { Field, InputType, Int } from '@nestjs/graphql'
-import { IsIn, IsNotEmpty, IsOptional } from 'class-validator'
+import { ArrayNotEmpty, ArrayUnique, IsIn, IsNotEmpty, IsOptional } from 'class-validator'
 
 import { OPEN_LEVELS } from '../constants/idea.constant'
 
@@ -18,6 +18,8 @@ export class IdeaCreateInput {
   @IsIn(Object.values(OPEN_LEVELS), { message: `openLevel must be either ${Object.values(OPEN_LEVELS).join(', ')}` })
   openLevel?: number
 
-  @Field(() => [Int], { nullable: true })
-  categoryIds?: number[]
+  @Field(() => [Int])
+  @ArrayNotEmpty()
+  @ArrayUnique()
+  categoryIds: number[]
 }

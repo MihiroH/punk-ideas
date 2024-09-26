@@ -1,46 +1,39 @@
 import { Field, HideField, Int, ObjectType } from '@nestjs/graphql'
-import { IsOptional } from 'class-validator'
 
 import { Comment } from '@src/comment/models/comment.model'
 import { Idea } from '@src/idea/models/idea.model'
 
 @ObjectType()
-class UserRelationsCount {
-  @Field(() => Int, { nullable: true })
+export class UserRelationsCount {
+  @Field(() => Int)
   ideas?: number
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   comments?: number
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   reports?: number
 }
 
 @ObjectType()
 export class UserRelations {
   @Field(() => [Idea], { nullable: true })
-  @IsOptional()
-  ideas?: Idea[]
+  ideas?: Idea[] | null
 
   @Field(() => Int, { nullable: true })
-  @IsOptional()
-  ideasCount?: number
+  ideasCount?: number | null
 
   @Field(() => [Comment], { nullable: true })
-  @IsOptional()
-  comments?: Comment[]
+  comments?: Comment[] | null
 
   @Field(() => Int, { nullable: true })
-  @IsOptional()
-  commentsCount?: number
+  commentsCount?: number | null
 
   @Field(() => Int, { nullable: true })
-  @IsOptional()
-  reportsCount?: number
+  reportsCount?: number | null
 
   @Field(() => UserRelationsCount, { nullable: true })
-  @IsOptional()
-  _count?: UserRelationsCount
+  _count?: UserRelationsCount | null
 }
 
 @ObjectType()
@@ -54,24 +47,20 @@ export class User extends UserRelations {
   @Field()
   username: string
 
-  @Field({ nullable: true })
-  @IsOptional()
-  nickname?: string
+  @Field(() => String, { nullable: true })
+  nickname: string | null
 
   @HideField()
   password: string
 
-  @Field({ nullable: true })
-  @IsOptional()
-  profileImage?: string
+  @Field(() => String, { nullable: true })
+  profileImage: string | null
 
   @Field(() => Int, { nullable: true })
-  @IsOptional()
-  age?: number
+  age: number | null
 
-  @Field({ nullable: true })
-  @IsOptional()
-  emailVerifiedAt?: Date
+  @Field(() => Date, { nullable: true })
+  emailVerifiedAt: Date | null
 
   @Field()
   createdAt: Date
@@ -79,6 +68,6 @@ export class User extends UserRelations {
   @Field()
   updatedAt: Date
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   deletedAt: Date | null
 }

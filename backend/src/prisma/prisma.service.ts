@@ -1,24 +1,21 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { Prisma, PrismaClient } from '@prisma/client'
 
-import { SORT_ORDER, VSortOrders } from '@src/common/constants/sortOrder.constant'
 import { OrderByArgs } from '@src/common/dto/orderBy.args'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { deepMergeObjects } from '@src/common/helpers/deepMergeObjects.helper'
-import { PRISMA_CLIENT_ERROR_CODE } from './constants/prisma.constant'
-import { CamelCasedModelName, ModelDelegateForUpdate, PrismaInclude, Relations } from './types/prisma.type'
-
-const defaultOrderBy = {
-  createdAt: SORT_ORDER.desc,
-}
+import { DEFAULT_ORDER_BY, PRISMA_CLIENT_ERROR_CODE } from './constants/prisma.constant'
+import { CamelCasedModelName, ModelDelegateForUpdate, PrismaInclude, RelationNames } from './types/prisma.type'
 
 // NOTE: PrismaService extends PrismaClientとした方が合理的だが、
 //       get client()で返すthisが"user"や"idea"を持たなくなるため、PrismaClientのインスタンス化を独自で行う
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
   private prismaClient: PrismaClient<Prisma.PrismaClientOptions, Prisma.LogLevel>
-  private transactionClient: Prisma.TransactionClient = null
+  private transactionClient: Prisma.TransactionClient | null = null
   private logger: Logger
+
+  private DEFAULT_ORDER_BY = DEFAULT_ORDER_BY
 
   constructor() {
     this.prismaClient = new PrismaClient({ log: ['query', 'info', 'warn', 'error'] })
@@ -69,21 +66,11 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     return this.transactionClient ?? this.prismaClient
   }
 
-  formatOrderBy(orderBy: OrderByArgs | OrderByArgs[], initialOrderBy: Record<string, VSortOrders> = defaultOrderBy) {
-    if (!orderBy) {
-      return initialOrderBy
-    }
-
-    if (Array.isArray(orderBy)) {
-      return orderBy.reduce((acc, { field, order }) => {
-        acc.push({ [field]: order })
-        return acc
-      }, [])
-    }
-
-    return {
-      [orderBy.field]: orderBy.order,
-    }
+  formatOrderBy(orderBy: OrderByArgs[] = DEFAULT_ORDER_BY) {
+    return orderBy.reduce<Array<Record<string, string>>>((acc, { field, order }) => {
+      acc.push({ [field]: order })
+      return acc
+    }, [])
   }
 
   createRelations<ModelName extends CamelCasedModelName, FieldNames extends string>(
@@ -99,6 +86,10 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
           .reverse()
           .find((item) => item.field === field)?.relations
 
+        if (!relations) {
+          return acc
+        }
+
         // NOTE: relationsの_countが複数ある場合は全て結合したいため、deepMergeObjectsを使う
         return deepMergeObjects([acc, relations])
       },
@@ -111,17 +102,20 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   async softDeleteWithRelations<ModelName extends CamelCasedModelName = CamelCasedModelName>(
     modelName: ModelName,
     id: number,
-    relations: Relations<Capitalize<ModelName>>[],
+    relations: RelationNames<Capitalize<ModelName>>[],
   ) {
-    const relationsQuery = relations.reduce((acc, relation) => {
-      acc[String(relation)] = {
-        updateMany: {
-          where: { deletedAt: null },
-          data: { deletedAt: new Date() },
-        },
-      }
-      return acc
-    }, {})
+    const relationsQuery = relations.reduce(
+      (acc, relation) => {
+        acc[String(relation)] = {
+          updateMany: {
+            where: { deletedAt: null },
+            data: { deletedAt: new Date() },
+          },
+        }
+        return acc
+      },
+      {} as Record<string, unknown>,
+    )
 
     const modelDelegate: ModelDelegateForUpdate = this.client[modelName]
 

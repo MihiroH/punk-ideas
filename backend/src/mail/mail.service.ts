@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
+import { CustomInternalServerErrorException } from '@src/common/errors/customInternalServerError.exception'
 import { createSendVerificationEmailOptions } from './helpers/createSendVerificationEmailOptions.helper'
 import { MailPitService } from './mailpit.service'
 import { SESService } from './ses.service'
@@ -19,8 +20,19 @@ export class MailService {
     private SESService: SESService,
     private mailPitService: MailPitService,
   ) {
-    this.fromAddress = this.configService.get('MAIL_FROM_ADDRESS')
-    this.tokenExpirationTime = this.configService.get('JWT_EXPIRES_IN')
+    const mailFromAddress: string | undefined = this.configService.get('MAIL_FROM_ADDRESS')
+    const tokenExpirationTime: string | undefined = this.configService.get('JWT_EXPIRES_IN')
+
+    if (!mailFromAddress) {
+      throw new CustomInternalServerErrorException('MAIL_FROM_ADDRESS is not defined in the environment variables')
+    }
+
+    if (!tokenExpirationTime) {
+      throw new CustomInternalServerErrorException('JWT_EXPIRES_IN is not defined in the environment variables')
+    }
+
+    this.fromAddress = mailFromAddress
+    this.tokenExpirationTime = tokenExpirationTime
 
     switch (this.configService.get('NODE_ENV')) {
       case 'production':

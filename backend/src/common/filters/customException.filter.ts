@@ -1,16 +1,18 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common'
 import { GqlArgumentsHost } from '@nestjs/graphql'
+import { customHasOwnProperty } from '../helpers/customHasOwnProperty.helper'
 
 @Catch(Error)
 export class CustomExceptionFilter implements ExceptionFilter {
   private readonly ERROR_NAME_STATUS_MAP = {
     CustomBadRequestException: HttpStatus.BAD_REQUEST,
+    CustomInternalServerErrorException: HttpStatus.INTERNAL_SERVER_ERROR,
     CustomUnauthorizedException: HttpStatus.UNAUTHORIZED,
     EmailAlreadyExistsException: HttpStatus.CONFLICT,
     EmailSendingFailedException: HttpStatus.INTERNAL_SERVER_ERROR,
     ResourceNotFoundException: HttpStatus.NOT_FOUND,
     UnauthorizedException: HttpStatus.UNAUTHORIZED,
-  }
+  } as const
 
   catch(exception: Error, host: ArgumentsHost) {
     if (exception instanceof Error) {
@@ -22,10 +24,9 @@ export class CustomExceptionFilter implements ExceptionFilter {
     const gqlHost = GqlArgumentsHost.create(host)
     const isGqlRequest = gqlHost.getContext().req
 
-    const status =
-      exception.name in this.ERROR_NAME_STATUS_MAP
-        ? this.ERROR_NAME_STATUS_MAP[exception.name]
-        : HttpStatus.INTERNAL_SERVER_ERROR
+    const status = customHasOwnProperty(this.ERROR_NAME_STATUS_MAP, exception.name)
+      ? this.ERROR_NAME_STATUS_MAP[exception.name]
+      : HttpStatus.INTERNAL_SERVER_ERROR
 
     // 例えばCustomBadRequestExceptionは複数のエラーメッセージを含む可能性があるためmessagesプロパティを用意している
     const message =
@@ -51,6 +52,9 @@ export class CustomExceptionFilter implements ExceptionFilter {
   private exceptionShortMessage(message: string): string {
     const shortMessage = message.substring(message.indexOf('→'))
 
-    return shortMessage.substring(shortMessage.indexOf('\n')).replace(/\n/g, '').trim()
+    return shortMessage
+      .substring(shortMessage.indexOf('\n'))
+      .replace(/\n|\s\s/g, '')
+      .trim()
   }
 }

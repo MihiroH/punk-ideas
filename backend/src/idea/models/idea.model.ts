@@ -1,5 +1,5 @@
 import { Field, HideField, Int, ObjectType } from '@nestjs/graphql'
-import { IsIn, IsOptional } from 'class-validator'
+import { IsIn } from 'class-validator'
 
 import { Category } from '@src/category/models/category.model'
 import { Comment } from '@src/comment/models/comment.model'
@@ -8,43 +8,36 @@ import { User } from '@src/user/models/user.model'
 import { OPEN_LEVELS } from '../constants/idea.constant'
 
 @ObjectType()
-class IdeaRelationsCount {
-  @Field(() => Int, { nullable: true })
+export class IdeaRelationsCount {
+  @Field(() => Int)
   comments?: number
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   reports?: number
 }
 
 @ObjectType()
 export class IdeaRelations {
   @Field(() => User, { nullable: true })
-  @IsOptional()
-  author?: User
+  author?: User | null
 
   @Field(() => [Comment], { nullable: true })
-  @IsOptional()
-  comments?: Comment[]
+  comments?: Comment[] | null
 
   @Field(() => Int, { nullable: true })
-  @IsOptional()
-  commentsCount?: number
+  commentsCount?: number | null
 
   @Field(() => Int, { nullable: true })
-  @IsOptional()
-  reportsCount?: number
+  reportsCount?: number | null
 
   @Field(() => [IdeaCategory], { nullable: true })
-  @IsOptional()
-  ideaCategories?: IdeaCategory[]
+  ideaCategories?: IdeaCategory[] | null
 
   @Field(() => [Category], { nullable: true })
-  @IsOptional()
-  categories?: Category[]
+  categories?: Category[] | null
 
   @Field(() => IdeaRelationsCount, { nullable: true })
-  @IsOptional()
-  _count?: IdeaRelationsCount
+  _count?: IdeaRelationsCount | null
 }
 
 @ObjectType()
@@ -74,6 +67,6 @@ export class Idea extends IdeaRelations {
   @Field()
   updatedAt: Date
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   deletedAt: Date | null
 }

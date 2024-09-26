@@ -1,5 +1,8 @@
-import { isObject } from 'class-validator'
+import { isObject } from './typeCheck'
 
-export const customHasOwnProperty = <T extends Record<string, unknown>>(obj: T, key: keyof T): key is keyof T => {
-  return isObject(obj) && Object.prototype.hasOwnProperty.call(obj, key)
+export const customHasOwnProperty = <T extends Record<string, unknown>>(
+  object: T,
+  key: string | number | symbol,
+): key is keyof T => {
+  return isObject(object) && Object.prototype.hasOwnProperty.call(object, key)
 }

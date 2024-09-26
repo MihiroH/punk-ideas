@@ -18,7 +18,7 @@ export class AuthController {
 
   @Get('verify-email')
   async verifyEmail(@Query('token') token: string) {
-    let decoded: JwtPayload = undefined
+    let decoded: JwtPayload | undefined = undefined
 
     try {
       decoded = this.authService.verifyJwtToken(token)
@@ -33,7 +33,7 @@ export class AuthController {
 
   @Get('verify-email-change')
   async verifyEmailChange(@Query('token') token: string) {
-    let decoded: JwtPayload = undefined
+    let decoded: JwtPayload | undefined = undefined
 
     try {
       decoded = this.authService.verifyJwtToken(token)

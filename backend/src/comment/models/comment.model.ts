@@ -1,11 +1,19 @@
 import { Field, HideField, Int, ObjectType } from '@nestjs/graphql'
-import { IsOptional } from 'class-validator'
 
 import { Idea } from '@src/idea/models/idea.model'
 import { User } from '@src/user/models/user.model'
 
 @ObjectType()
-export class Comment {
+export class CommentRelations {
+  @Field(() => User, { nullable: true })
+  author?: User | null
+
+  @Field(() => Idea, { nullable: true })
+  idea?: Idea | null
+}
+
+@ObjectType()
+export class Comment extends CommentRelations {
   @Field(() => Int)
   id: number
 
@@ -27,14 +35,6 @@ export class Comment {
   @Field()
   updatedAt: Date
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   deletedAt: Date | null
-
-  @Field(() => User, { nullable: true })
-  @IsOptional()
-  author?: User
-
-  @Field(() => Idea, { nullable: true })
-  @IsOptional()
-  idea?: Idea
 }

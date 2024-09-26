@@ -14,3 +14,5 @@ export const PRISMA_CLIENT_ERROR_CODE = {
   uniqueConstraintFailed: 'P2002',
   recordsNotFound: 'P2025',
 } as const
+
+export const DEFAULT_ORDER_BY = [{ field: 'createdAt', order: SORT_ORDER.desc }]

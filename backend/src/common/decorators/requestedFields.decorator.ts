@@ -23,7 +23,9 @@ export const RequestedFields = createParamDecorator((_data: unknown, context: Ex
   const ctx = GqlExecutionContext.create(context)
   const info: GraphQLResolveInfo = ctx.getInfo()
 
-  return info.fieldNodes[0].selectionSet.selections
+  const fields = info.fieldNodes[0].selectionSet?.selections
     .map((field: SelectionNode) => ('name' in field ? field.name.value : ''))
     .filter(Boolean)
+
+  return fields ?? []
 })

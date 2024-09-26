@@ -16,4 +16,7 @@ export class PendingEmailChange {
 
   @Field()
   createdAt: Date
+
+  @Field(() => Date, { nullable: true })
+  deletedAt: Date | null
 }

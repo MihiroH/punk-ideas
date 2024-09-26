@@ -1,5 +1,5 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql'
-import { IsIn, IsOptional } from 'class-validator'
+import { ArrayNotEmpty, IsIn, IsOptional } from 'class-validator'
 
 import { IsOrderByFieldValid } from '@src/common/decorators/isOrderByValid.decorator'
 import { OrderByArgs } from '@src/common/dto/orderBy.args'
@@ -7,13 +7,13 @@ import { OPEN_LEVELS } from '../constants/idea.constant'
 
 @ArgsType()
 export class IdeasGetArgs {
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
-  title: string
+  title?: string
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
-  content: string
+  content?: string
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -22,6 +22,7 @@ export class IdeasGetArgs {
 
   @Field(() => [OrderByArgs], { nullable: true })
   @IsOptional()
+  @ArrayNotEmpty()
   @IsOrderByFieldValid(['id', 'title', 'content', 'openLevel', 'createdAt', 'updatedAt'])
   orderBy?: OrderByArgs[]
 

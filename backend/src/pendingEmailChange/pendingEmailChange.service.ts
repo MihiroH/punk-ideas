@@ -10,7 +10,7 @@ import { PendingEmailChange } from './models/pendingEmailChange.model'
 export class PendingEmailChangeService {
   constructor(private prismaService: PrismaService) {}
 
-  async findByUserIdAndToken(userId: number, token: string): Promise<PendingEmailChange> {
+  async findByUserIdAndToken(userId: number, token: string): Promise<PendingEmailChange | null> {
     return await this.prismaService.client.pendingEmailChange.findFirst({
       where: {
         userId,

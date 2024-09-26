@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Category, Prisma } from '@prisma/client'
 
+import { SORT_ORDER } from '@src/common/constants/sortOrder.constant'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
+import { strictEntries } from '@src/common/helpers/strictEntries.helper'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
 import { FIELD_RELATIONS } from './constants/idea.constant'
@@ -15,17 +17,34 @@ export class IdeaService {
   private readonly COUNT_KEY_FIELD_MAP = {
     comments: 'commentsCount',
     reports: 'reportsCount',
-  }
+  } as const
 
   constructor(private prismaService: PrismaService) {}
 
+  formatIdea(idea: Idea): Idea {
+    const result = { ...idea }
+
+    if ('ideaCategories' in idea) {
+      result.categories = idea.ideaCategories
+        ?.map((ideaCategory) => ideaCategory.category)
+        .filter((c): c is Category => !!c)
+    }
+
+    if (idea._count) {
+      for (const [key, value] of strictEntries(idea._count)) {
+        const field = this.COUNT_KEY_FIELD_MAP[key]
+        result[field] = value
+      }
+    }
+
+    return result
+  }
+
   async create(data: IdeaCreateInput, authorId: number, authorIp: string): Promise<Idea> {
     const { categoryIds, ...restData } = data
-
-    return await this.prismaService.client.idea.create({
+    const resource = await this.prismaService.client.idea.create({
       data: {
         ...restData,
-        authorId,
         authorIp: Buffer.from(authorIp),
         ideaCategories: {
           create: categoryIds?.map((categoryId) => ({
@@ -34,33 +53,29 @@ export class IdeaService {
             },
           })),
         },
+        author: {
+          connect: { id: authorId },
+        },
+      },
+      include: {
+        ideaCategories: {
+          include: {
+            category: true,
+          },
+          orderBy: {
+            category: {
+              id: SORT_ORDER.asc,
+            },
+          },
+        },
       },
     })
+
+    return this.formatIdea(resource)
   }
 
   createRelations(fields: Parameters<PrismaService['createRelations']>[0], fieldRelations = this.FIELD_RELATIONS) {
     return this.prismaService.createRelations<'idea', keyof IdeaRelations>(fields, fieldRelations)
-  }
-
-  formatIdea(idea: Idea | null): Idea | null {
-    if (!idea) {
-      return null
-    }
-
-    const result = { ...idea }
-
-    if ('ideaCategories' in idea) {
-      result.categories = idea.ideaCategories?.map((category) => category.category) ?? null
-    }
-
-    if (idea._count) {
-      for (const [key, value] of Object.entries(idea._count)) {
-        const field = this.COUNT_KEY_FIELD_MAP[key]
-        result[field] = value
-      }
-    }
-
-    return result
   }
 
   async findMany(
@@ -115,8 +130,8 @@ export class IdeaService {
     })
   }
 
-  async findById(id: number, include?: Prisma.IdeaInclude): Promise<Idea> {
-    const resource = await this.prismaService.client.idea.findUniqueOrThrow({
+  async findById(id: number, include?: Prisma.IdeaInclude): Promise<Idea | null> {
+    const resource = await this.prismaService.client.idea.findUnique({
       where: {
         id,
         deletedAt: null,
@@ -124,7 +139,7 @@ export class IdeaService {
       include,
     })
 
-    return this.formatIdea(resource)
+    return resource ? this.formatIdea(resource) : null
   }
 
   async update(args: Prisma.IdeaUpdateArgs): Promise<Idea> {

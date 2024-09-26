@@ -7,7 +7,7 @@ export class AppValidationPipe extends ValidationPipe {
       exceptionFactory: (errors) => {
         const messages = errors.map((error) => ({
           field: error.property,
-          error: Object.values(error.constraints)[0],
+          error: Object.values(error.constraints ?? {})[0],
         }))
 
         return new CustomBadRequestException(messages)
