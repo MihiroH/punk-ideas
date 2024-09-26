@@ -9,6 +9,6 @@ export class OrderByArgs {
   field: string
 
   @Field()
-  @IsIn(Object.values(SORT_ORDER), { message: `order must be either ${Object.values(SORT_ORDER).join(', ')}` })
+  @IsIn(Object.values(SORT_ORDER), { message: `order must be one of ${Object.values(SORT_ORDER).join(', ')}` })
   order: string
 }

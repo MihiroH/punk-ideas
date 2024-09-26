@@ -7,6 +7,7 @@ import {
 } from 'class-validator'
 
 import { OrderByArgs } from '@src/common/dto/orderBy.args'
+import { SORT_ORDER } from '../constants/sortOrder.constant'
 
 @ValidatorConstraint({ async: true })
 class IsOrderByFieldValidConstraint implements ValidatorConstraintInterface {
@@ -21,8 +22,8 @@ class IsOrderByFieldValidConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage(args: ValidationArguments) {
-    const [fields, orders] = args.constraints
-    return `Field must be one of ${fields.join(', ')} and order must be one of ${orders.join(', ')}`
+    const fields = args.constraints
+    return `Field must be one of ${fields.join(', ')} and order must be one of ${Object.values(SORT_ORDER).join(', ')}`
   }
 }
 
