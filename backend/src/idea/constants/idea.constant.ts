@@ -49,7 +49,11 @@ export const FIELD_RELATIONS: Array<{
     relations: {
       _count: {
         select: {
-          comments: true,
+          comments: {
+            where: {
+              deletedAt: null,
+            },
+          },
         },
       },
     },
