@@ -5,7 +5,7 @@ import { PrismaService } from '@src/prisma/prisma.service'
 export class CategoryService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAll() {
+  async list() {
     return await this.prismaService.client.category.findMany()
   }
 }

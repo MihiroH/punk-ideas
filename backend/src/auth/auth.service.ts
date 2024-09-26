@@ -50,7 +50,7 @@ export class AuthService {
   }
 
   async requestEmailChange(userId: number, emailChangeRequestInput: EmailChangeRequestInput): Promise<boolean> {
-    const user = await this.userService.findById(userId)
+    const user = await this.userService.getById(userId)
 
     if (!user) {
       throw new CustomUnauthorizedException('userNotFound')
@@ -100,7 +100,7 @@ export class AuthService {
   async verifyEmailChange(userId: number, newEmail: string, pendingEmailChangeId: number): Promise<boolean> {
     await this.prismaService.runTransaction(async () => {
       await this.userService.verifyAndChangeEmail(userId, newEmail)
-      await this.pendingEmailChangeService.softDelete(pendingEmailChangeId)
+      await this.pendingEmailChangeService.delete(pendingEmailChangeId)
     })
     return true
   }
@@ -110,7 +110,7 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.userService.findByEmail(email)
+    const user = await this.userService.getByEmail(email)
 
     if (user && (await this.isPasswordCorrect(password, user))) {
       return user

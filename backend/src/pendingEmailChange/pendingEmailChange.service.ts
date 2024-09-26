@@ -10,7 +10,7 @@ import { PendingEmailChange } from './models/pendingEmailChange.model'
 export class PendingEmailChangeService {
   constructor(private prismaService: PrismaService) {}
 
-  async findByUserIdAndToken(userId: number, token: string): Promise<PendingEmailChange | null> {
+  async getByUserIdAndToken(userId: number, token: string): Promise<PendingEmailChange | null> {
     return await this.prismaService.client.pendingEmailChange.findFirst({
       where: {
         userId,
@@ -45,7 +45,7 @@ export class PendingEmailChangeService {
     }
   }
 
-  async softDelete(id: number): Promise<boolean> {
+  async delete(id: number): Promise<boolean> {
     const deletedPendingEmailChange = await this.update({
       where: { id },
       data: { deletedAt: new Date() },

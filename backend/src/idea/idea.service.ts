@@ -76,10 +76,7 @@ export class IdeaService {
     return this.prismaService.createRelations<'idea', keyof IdeaRelations>(fields, fieldRelations)
   }
 
-  async findMany(
-    args?: { ideasGetArgs?: IdeasGetArgs; userId?: number },
-    include?: Prisma.IdeaInclude,
-  ): Promise<Idea[]> {
+  async list(args?: { ideasGetArgs?: IdeasGetArgs; userId?: number }, include?: Prisma.IdeaInclude): Promise<Idea[]> {
     const { ideasGetArgs, userId } = args ?? {}
     const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
 
@@ -128,7 +125,7 @@ export class IdeaService {
     })
   }
 
-  async findById(id: number, include?: Prisma.IdeaInclude): Promise<Idea | null> {
+  async getById(id: number, include?: Prisma.IdeaInclude): Promise<Idea | null> {
     const resource = await this.prismaService.client.idea.findUnique({
       where: {
         id,
@@ -155,7 +152,7 @@ export class IdeaService {
     }
   }
 
-  async softDelete(id: number): Promise<boolean> {
+  async delete(id: number): Promise<boolean> {
     const deletedIdea = await this.update({
       where: { id },
       data: { deletedAt: new Date() },
