@@ -8,7 +8,7 @@ import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
 import { FIELD_RELATIONS } from './constants/idea.constant'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
-import { IdeasGetArgs } from './dto/ideasGet.args'
+import { IdeasGetArgs, IdeasGetArgsExtended } from './dto/ideasGet.args'
 import { Idea, IdeaRelations } from './models/idea.model'
 
 @Injectable()
@@ -76,47 +76,74 @@ export class IdeaService {
     return this.prismaService.createRelations<'idea', keyof IdeaRelations>(fields, fieldRelations)
   }
 
-  async list(args?: { ideasGetArgs?: IdeasGetArgs; userId?: number }, include?: Prisma.IdeaInclude): Promise<Idea[]> {
-    const { ideasGetArgs, userId } = args ?? {}
+  createListOptions(options?: { ideasGetArgs?: IdeasGetArgsExtended; reporterId?: number; authorId?: number }): Omit<
+    Prisma.IdeaFindManyArgs,
+    'relationLoadStrategy'
+  > {
+    const { ideasGetArgs, reporterId, authorId } = options ?? {}
     const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
 
-    const resources = await this.prismaService.client.idea.findMany({
+    return {
       where: {
+        authorId,
         title: { contains: title },
         content: { contains: content },
         deletedAt: null,
         reports:
-          includeReportedBySelf || userId === undefined
+          includeReportedBySelf || reporterId === undefined
             ? undefined
             : {
                 none: {
-                  reporterId: userId,
+                  reporterId,
                 },
               },
         ...restArgs,
       },
       orderBy: this.prismaService.formatOrderBy(orderBy),
+    }
+  }
+
+  async list(
+    args?: { ideasGetArgs?: IdeasGetArgsExtended; reporterId?: number; authorId?: number },
+    include?: Prisma.IdeaInclude,
+  ): Promise<Idea[]> {
+    const resources = await this.prismaService.client.idea.findMany({
+      ...this.createListOptions(args),
       include,
     })
 
     return resources.map((r) => this.formatIdea(r))
   }
 
-  async count(args?: { ideasGetArgs?: IdeasGetArgs; userId?: number }): Promise<number> {
-    const { userId, ideasGetArgs } = args ?? {}
+  async listByAuthorId(authorId: number, args?: { ideasGetArgs?: IdeasGetArgs }): Promise<Idea[]> {
+    const resources = await this.prismaService.client.user
+      .findUnique({
+        where: {
+          id: authorId,
+          deletedAt: null,
+        },
+      })
+      .ideas(this.createListOptions(args))
+
+    return resources ?? []
+  }
+
+  async count(args?: { ideasGetArgs?: IdeasGetArgsExtended; reporterId?: number; authorId?: number }): Promise<number> {
+    const { ideasGetArgs, reporterId, authorId } = args ?? {}
     const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
 
     return await this.prismaService.client.idea.count({
       where: {
+        authorId,
         title: { contains: title },
         content: { contains: content },
         deletedAt: null,
         reports:
-          includeReportedBySelf || userId === undefined
+          includeReportedBySelf || reporterId === undefined
             ? undefined
             : {
                 none: {
-                  reporterId: userId,
+                  reporterId,
                 },
               },
         ...restArgs,

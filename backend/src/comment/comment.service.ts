@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '@src/prisma/prisma.service'
 
+import { SORT_ORDER } from '@src/common/constants/sortOrder.constant'
 import { CommentCreateInput } from './dto/commentCreate.input'
 import { Comment } from './models/comment.model'
 
@@ -16,5 +17,24 @@ export class CommentService {
         authorIp: Buffer.from(authorIp),
       },
     })
+  }
+
+  async listByIdeaId(ideaId: number): Promise<Comment[]> {
+    const resources = await this.prismaService.client.idea
+      .findUnique({
+        where: {
+          id: ideaId,
+        },
+      })
+      .comments({
+        where: {
+          deletedAt: null,
+        },
+        orderBy: {
+          createdAt: SORT_ORDER.desc,
+        },
+      })
+
+    return resources ?? []
   }
 }

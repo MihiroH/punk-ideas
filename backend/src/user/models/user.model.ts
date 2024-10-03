@@ -17,8 +17,8 @@ export class UserRelationsCount {
 
 @ObjectType()
 export class UserRelations {
-  @Field(() => [Idea], { nullable: true })
-  ideas?: Idea[] | null
+  @Field(() => [Idea])
+  ideas?: Idea[]
 
   @Field(() => Int, { nullable: true })
   ideasCount?: number | null

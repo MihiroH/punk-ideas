@@ -7,5 +7,6 @@ import { CommentService } from './comment.service'
 @Module({
   imports: [PrismaModule],
   providers: [CommentService, CommentResolver],
+  exports: [CommentService],
 })
 export class CommentModule {}

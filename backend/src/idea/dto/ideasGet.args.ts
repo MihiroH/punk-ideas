@@ -25,7 +25,10 @@ export class IdeasGetArgs {
   @ArrayNotEmpty()
   @IsOrderByFieldValid(['id', 'title', 'content', 'openLevel', 'createdAt', 'updatedAt'])
   orderBy?: OrderByArgs[]
+}
 
+@ArgsType()
+export class IdeasGetArgsExtended extends IdeasGetArgs {
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
   includeReportedBySelf?: boolean

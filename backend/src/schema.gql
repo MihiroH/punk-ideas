@@ -14,6 +14,48 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type UserRelationsCount {
+  ideas: Int!
+  comments: Int!
+  reports: Int!
+}
+
+type User {
+  ideas(title: String, content: String, openLevel: Int, orderBy: [OrderByArgs!]): [Idea!]!
+  ideasCount: Int
+  comments: [Comment!]
+  commentsCount: Int
+  reportsCount: Int
+  _count: UserRelationsCount
+  id: Int!
+  email: String!
+  username: String!
+  nickname: String
+  profileImage: String
+  age: Int
+  emailVerifiedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+}
+
+input OrderByArgs {
+  field: String!
+  order: String!
+}
+
+type Comment {
+  author: User
+  idea: Idea
+  id: Int!
+  ideaId: Int!
+  authorId: Int!
+  content: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+}
+
 type IdeaCategory {
   category: Category
   id: Int!
@@ -46,43 +88,6 @@ type Idea {
   deletedAt: DateTime
 }
 
-type Comment {
-  author: User
-  idea: Idea
-  id: Int!
-  ideaId: Int!
-  authorId: Int!
-  content: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  deletedAt: DateTime
-}
-
-type UserRelationsCount {
-  ideas: Int!
-  comments: Int!
-  reports: Int!
-}
-
-type User {
-  ideas: [Idea!]
-  ideasCount: Int
-  comments: [Comment!]
-  commentsCount: Int
-  reportsCount: Int
-  _count: UserRelationsCount
-  id: Int!
-  email: String!
-  username: String!
-  nickname: String
-  profileImage: String
-  age: Int
-  emailVerifiedAt: DateTime
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  deletedAt: DateTime
-}
-
 type SignInResponse {
   accessToken: String!
   user: User!
@@ -90,15 +95,10 @@ type SignInResponse {
 
 type Query {
   user: User!
-  categories: [Category!]!
   ideas(title: String, content: String, openLevel: Int, orderBy: [OrderByArgs!], includeReportedBySelf: Boolean): [Idea!]
   ideasCount(title: String, content: String, openLevel: Int, orderBy: [OrderByArgs!], includeReportedBySelf: Boolean): Int!
   idea(id: Int!): Idea!
-}
-
-input OrderByArgs {
-  field: String!
-  order: String!
+  categories: [Category!]!
 }
 
 type Mutation {
@@ -107,9 +107,9 @@ type Mutation {
   requestEmailChange(emailChangeRequestInput: EmailChangeRequestInput!): Boolean!
   updateUserProfile(userProfileUpdateInput: UserProfileUpdateInput!): User!
   deleteUser: Boolean!
-  createComment(commentCreateInput: CommentCreateInput!): Comment!
   createIdea(ideaCreateInput: IdeaCreateInput!): Idea!
   deleteIdea(id: Int!): Boolean!
+  createComment(commentCreateInput: CommentCreateInput!): Comment!
 }
 
 input SignUpInput {
@@ -138,14 +138,14 @@ input UserProfileUpdateInput {
   age: Int
 }
 
-input CommentCreateInput {
-  ideaId: Int!
-  content: String!
-}
-
 input IdeaCreateInput {
   title: String!
   content: String!
   openLevel: Int
   categoryIds: [Int!]!
+}
+
+input CommentCreateInput {
+  ideaId: Int!
+  content: String!
 }
