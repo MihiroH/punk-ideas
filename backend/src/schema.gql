@@ -14,6 +14,15 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type IdeaFavorite {
+  user: User
+  idea: Idea
+  id: Int!
+  userId: Int!
+  ideaId: Int!
+  createdAt: DateTime!
+}
+
 type IdeaCategory {
   category: Category
   id: Int!
@@ -26,6 +35,7 @@ type IdeaCategory {
 type IdeaRelationsCount {
   comments: Int!
   reports: Int!
+  favorites: Int!
 }
 
 type Idea {
@@ -35,6 +45,8 @@ type Idea {
   reportsCount: Int
   ideaCategories: [IdeaCategory!]
   categories: [Category!]
+  favorites: [IdeaFavorite!]
+  favoritesCount: Int
   _count: IdeaRelationsCount
   id: Int!
   authorId: Int!
@@ -62,6 +74,7 @@ type UserRelationsCount {
   ideas: Int!
   comments: Int!
   reports: Int!
+  ideaFavorites: Int!
 }
 
 type User {
@@ -70,6 +83,9 @@ type User {
   comments: [Comment!]
   commentsCount: Int
   reportsCount: Int
+  ideaFavorites: [IdeaFavorite!]
+  favoriteIdeas: [Idea!]
+  favoriteIdeasCount: Int
   _count: UserRelationsCount
   id: Int!
   email: String!
@@ -108,6 +124,8 @@ type Mutation {
   updateUserProfile(userProfileUpdateInput: UserProfileUpdateInput!): User!
   deleteUser: Boolean!
   createComment(commentCreateInput: CommentCreateInput!): Comment!
+  createIdeaFavorite(ideaId: Int!): IdeaFavorite!
+  deleteIdeaFavorite(ideaId: Int!): Boolean!
   createIdea(ideaCreateInput: IdeaCreateInput!): Idea!
   deleteIdea(id: Int!): Boolean!
 }

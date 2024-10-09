@@ -37,7 +37,7 @@ export class IdeaResolver {
     const relations = this.ideaService.createRelations(requestedFields)
 
     if (user) {
-      return await this.ideaService.list({ ideasGetArgs, userId: user?.id }, relations)
+      return await this.ideaService.list({ ideasGetArgs, reporterId: user?.id }, relations)
     }
 
     return await this.ideaService.list({ ideasGetArgs }, relations)
@@ -56,7 +56,7 @@ export class IdeaResolver {
     }
 
     if (user) {
-      return await this.ideaService.count({ ideasGetArgs, userId: user?.id })
+      return await this.ideaService.count({ ideasGetArgs, reporterId: user?.id })
     }
 
     return await this.ideaService.count({ ideasGetArgs })

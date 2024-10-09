@@ -17,6 +17,7 @@ export class IdeaService {
   private readonly COUNT_KEY_FIELD_MAP = {
     comments: 'commentsCount',
     reports: 'reportsCount',
+    favorites: 'favoritesCount',
   } as const
 
   constructor(private prismaService: PrismaService) {}
@@ -76,8 +77,11 @@ export class IdeaService {
     return this.prismaService.createRelations<'idea', keyof IdeaRelations>(fields, fieldRelations)
   }
 
-  async list(args?: { ideasGetArgs?: IdeasGetArgs; userId?: number }, include?: Prisma.IdeaInclude): Promise<Idea[]> {
-    const { ideasGetArgs, userId } = args ?? {}
+  async list(
+    args?: { ideasGetArgs?: IdeasGetArgs; reporterId?: number },
+    include?: Prisma.IdeaInclude,
+  ): Promise<Idea[]> {
+    const { ideasGetArgs, reporterId } = args ?? {}
     const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
 
     const resources = await this.prismaService.client.idea.findMany({
@@ -86,11 +90,11 @@ export class IdeaService {
         content: { contains: content },
         deletedAt: null,
         reports:
-          includeReportedBySelf || userId === undefined
+          includeReportedBySelf || reporterId === undefined
             ? undefined
             : {
                 none: {
-                  reporterId: userId,
+                  reporterId,
                 },
               },
         ...restArgs,
@@ -102,8 +106,8 @@ export class IdeaService {
     return resources.map((r) => this.formatIdea(r))
   }
 
-  async count(args?: { ideasGetArgs?: IdeasGetArgs; userId?: number }): Promise<number> {
-    const { userId, ideasGetArgs } = args ?? {}
+  async count(args?: { ideasGetArgs?: IdeasGetArgs; reporterId?: number }): Promise<number> {
+    const { reporterId, ideasGetArgs } = args ?? {}
     const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
 
     return await this.prismaService.client.idea.count({
@@ -112,11 +116,11 @@ export class IdeaService {
         content: { contains: content },
         deletedAt: null,
         reports:
-          includeReportedBySelf || userId === undefined
+          includeReportedBySelf || reporterId === undefined
             ? undefined
             : {
                 none: {
-                  reporterId: userId,
+                  reporterId,
                 },
               },
         ...restArgs,

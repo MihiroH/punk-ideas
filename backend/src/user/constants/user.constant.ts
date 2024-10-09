@@ -71,4 +71,70 @@ export const FIELD_RELATIONS: Array<{
       },
     },
   },
+  {
+    field: 'favoriteIdeas',
+    relations: {
+      ideaFavorites: {
+        include: {
+          idea: {
+            include: {
+              author: true,
+              ideaCategories: {
+                include: {
+                  category: true,
+                },
+                orderBy: {
+                  category: {
+                    id: SORT_ORDER.asc,
+                  },
+                },
+              },
+              _count: {
+                select: {
+                  comments: {
+                    where: {
+                      deletedAt: null,
+                    },
+                  },
+                  favorites: {
+                    where: {
+                      idea: {
+                        deletedAt: null,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        where: {
+          idea: {
+            deletedAt: null,
+          },
+        },
+        orderBy: {
+          idea: {
+            createdAt: SORT_ORDER.desc,
+          },
+        },
+      },
+    },
+  },
+  {
+    field: 'favoriteIdeasCount',
+    relations: {
+      _count: {
+        select: {
+          ideaFavorites: {
+            where: {
+              idea: {
+                deletedAt: null,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 ]

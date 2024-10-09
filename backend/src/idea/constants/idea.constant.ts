@@ -73,4 +73,20 @@ export const FIELD_RELATIONS: Array<{
       },
     },
   },
+  {
+    field: 'favoritesCount',
+    relations: {
+      _count: {
+        select: {
+          favorites: {
+            where: {
+              idea: {
+                deletedAt: null,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 ]

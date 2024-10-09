@@ -92,6 +92,7 @@ const main = async () => {
             deletedAt: null,
             t_idea_categories: (createMany) => createMany({ min: 1, max: 3 }, { updatedAt: now }),
             t_idea_files: (createMany) => createMany({ min: 0, max: 5 }, { updatedAt: now }),
+            t_idea_favorites: (createMany) => createMany({ min: 0, max: 5 }),
             t_comments: (createMany) => createMany({ min: 0, max: 5 }, { updatedAt: now, deletedAt: null }),
             t_reports: (createMany) => createMany({ min: 0, max: 5 }, { updatedAt: now }),
           })),
