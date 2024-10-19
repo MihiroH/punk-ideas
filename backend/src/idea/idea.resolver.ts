@@ -43,6 +43,8 @@ export class IdeaResolver {
       ])
     }
 
+    // TODO: comments.isMyFavoriteのBadRequestExceptionチェック
+
     const relations = this.ideaService.createRelations(requestedFields, this.ideaService.FIELD_RELATIONS, user?.id)
 
     if (user) {

@@ -29,9 +29,10 @@ model User {
 
   pendingEmailChanges PendingEmailChange[]
   ideas               Idea[]
-  comments            Comment[]
-  reports             Report[]
   ideaFavorites       IdeaFavorite[]
+  comments            Comment[]
+  commentFavorites    CommentFavorite[]
+  reports             Report[]
   // aiCheckLogs AICheckLog[] // TODO: AIチェック機能を実装するときに有効化する
 
   @@map("m_users")
@@ -50,6 +51,17 @@ model PendingEmailChange {
   @@map("t_pending_email_changes")
 }
 
+model Category {
+  id        Int      @id @default(autoincrement()) @map("id")
+  name      String   @map("name")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  ideaCategories IdeaCategory[]
+
+  @@map("m_categories")
+}
+
 model Idea {
   id        Int       @id @default(autoincrement()) @map("id")
   authorId  Int       @map("author_id")
@@ -63,13 +75,39 @@ model Idea {
   deletedAt DateTime? @map("deleted_at")
 
   author         User           @relation(fields: [authorId], references: [id])
-  ideaFiles      IdeaFile[]
   comments       Comment[]
-  ideaCategories IdeaCategory[]
-  reports        Report[]
   favorites      IdeaFavorite[]
+  ideaCategories IdeaCategory[]
+  ideaFiles      IdeaFile[]
+  reports        Report[]
 
   @@map("t_ideas")
+}
+
+model IdeaCategory {
+  id         Int      @id @default(autoincrement()) @map("id")
+  ideaId     Int      @map("idea_id")
+  categoryId Int      @map("category_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  idea     Idea     @relation(fields: [ideaId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@map("t_idea_categories")
+}
+
+model IdeaFavorite {
+  id        Int      @id @default(autoincrement()) @map("id")
+  userId    Int      @map("user_id")
+  ideaId    Int      @map("idea_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+  idea Idea @relation(fields: [ideaId], references: [id])
+
+  @@unique([userId, ideaId]) // Ensure a user can only favorite an idea once
+  @@map("t_idea_favorites")
 }
 
 model IdeaFile {
@@ -95,34 +133,24 @@ model Comment {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  idea   Idea @relation(fields: [ideaId], references: [id])
-  author User @relation(fields: [authorId], references: [id])
+  idea      Idea              @relation(fields: [ideaId], references: [id])
+  author    User              @relation(fields: [authorId], references: [id])
+  favorites CommentFavorite[]
 
   @@map("t_comments")
 }
 
-model IdeaCategory {
-  id         Int      @id @default(autoincrement()) @map("id")
-  ideaId     Int      @map("idea_id")
-  categoryId Int      @map("category_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  idea     Idea     @relation(fields: [ideaId], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
-
-  @@map("t_idea_categories")
-}
-
-model Category {
+model CommentFavorite {
   id        Int      @id @default(autoincrement()) @map("id")
-  name      String   @map("name")
+  userId    Int      @map("user_id")
+  commentId Int      @map("comment_id")
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
 
-  ideaCategories IdeaCategory[]
+  user    User    @relation(fields: [userId], references: [id])
+  comment Comment @relation(fields: [commentId], references: [id])
 
-  @@map("m_categories")
+  @@unique([userId, commentId]) // Ensure a user can only favorite an idea once
+  @@map("t_comment_favorites")
 }
 
 model Report {
@@ -151,19 +179,6 @@ model ReportReason {
   reports Report[]
 
   @@map("m_report_reasons")
-}
-
-model IdeaFavorite {
-  id        Int      @id @default(autoincrement()) @map("id")
-  userId    Int      @map("user_id")
-  ideaId    Int      @map("idea_id")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id])
-  idea Idea @relation(fields: [ideaId], references: [id])
-
-  @@unique([userId, ideaId]) // Ensure a user can only favorite an idea once
-  @@map("t_idea_favorites")
 }
 
 // TODO: AIチェック機能を実装するときに有効化する

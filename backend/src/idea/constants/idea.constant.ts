@@ -45,6 +45,23 @@ export const FIELD_RELATIONS: Array<{
         },
         include: {
           author: true,
+          favorites: {
+            where: {
+              // 利用するときにuserIdを置換する処理が必要
+              userId: '%userId%' as unknown as number,
+            },
+          },
+          _count: {
+            select: {
+              favorites: {
+                where: {
+                  comment: {
+                    deletedAt: null,
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },

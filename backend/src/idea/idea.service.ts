@@ -37,6 +37,14 @@ export class IdeaService {
       result.isMyFavorite = !!idea.favorites.length
     }
 
+    if (idea.comments) {
+      result.comments = idea.comments.map((comment) => ({
+        ...comment,
+        favoritesCount: comment._count?.favorites,
+        isMyFavorite: !!comment.favorites?.length,
+      }))
+    }
+
     if (idea._count) {
       for (const [key, value] of strictEntries(idea._count)) {
         const field = this.COUNT_KEY_FIELD_MAP[key]
@@ -87,20 +95,41 @@ export class IdeaService {
     const newFieldRelations = [...fieldRelations]
     const relationOfIsMyFavorite = this.FIELD_RELATIONS.find((relation) => relation.field === 'isMyFavorite')
 
-    if (relationOfIsMyFavorite && userId !== undefined) {
-      const fieldRelation = deepMergeObjects([
-        relationOfIsMyFavorite,
-        {
-          field: relationOfIsMyFavorite.field,
-          relations: {
-            favorites: {
-              where: {
-                userId,
+    if (relationOfIsMyFavorite) {
+      const fieldRelation = deepMergeObjects(
+        [
+          relationOfIsMyFavorite,
+          {
+            field: relationOfIsMyFavorite.field,
+            relations: {
+              favorites: userId === undefined ? undefined : { where: { userId } },
+            },
+          },
+        ],
+        { deleteIfUndefinedIsSpecified: true },
+      )
+      newFieldRelations.push(fieldRelation)
+    }
+
+    const relationOfIsMyFavoriteInComment = this.FIELD_RELATIONS.find((relation) => relation.field === 'comments')
+
+    if (relationOfIsMyFavoriteInComment) {
+      const fieldRelation = deepMergeObjects(
+        [
+          relationOfIsMyFavoriteInComment,
+          {
+            field: relationOfIsMyFavoriteInComment.field,
+            relations: {
+              comments: {
+                include: {
+                  favorites: userId === undefined ? undefined : { where: { userId } },
+                },
               },
             },
           },
-        },
-      ])
+        ],
+        { deleteIfUndefinedIsSpecified: true },
+      )
       newFieldRelations.push(fieldRelation)
     }
 

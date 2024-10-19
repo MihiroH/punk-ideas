@@ -1,7 +1,14 @@
 import { Field, HideField, Int, ObjectType } from '@nestjs/graphql'
 
+import { CommentFavorite } from '@src/commentFavorite/models/commentFavorite.model'
 import { Idea } from '@src/idea/models/idea.model'
 import { User } from '@src/user/models/user.model'
+
+@ObjectType()
+export class CommentRelationsCount {
+  @Field(() => Int)
+  favorites?: number
+}
 
 @ObjectType()
 export class CommentRelations {
@@ -10,6 +17,18 @@ export class CommentRelations {
 
   @Field(() => Idea, { nullable: true })
   idea?: Idea | null
+
+  @Field(() => [CommentFavorite], { nullable: true })
+  favorites?: CommentFavorite[] | null
+
+  @Field(() => Int, { nullable: true })
+  favoritesCount?: number | null
+
+  @Field(() => Boolean, { nullable: true })
+  isMyFavorite?: boolean | null
+
+  @Field(() => CommentRelationsCount, { nullable: true })
+  _count?: CommentRelationsCount | null
 }
 
 @ObjectType()
