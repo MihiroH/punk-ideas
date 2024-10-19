@@ -89,4 +89,15 @@ export const FIELD_RELATIONS: Array<{
       },
     },
   },
+  {
+    field: 'isMyFavorite',
+    relations: {
+      favorites: {
+        where: {
+          // 利用するときにuserIdを置換する処理が必要
+          userId: '%userId%' as unknown as number,
+        },
+      },
+    },
+  },
 ]

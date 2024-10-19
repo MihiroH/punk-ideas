@@ -14,15 +14,6 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type IdeaFavorite {
-  user: User
-  idea: Idea
-  id: Int!
-  userId: Int!
-  ideaId: Int!
-  createdAt: DateTime!
-}
-
 type IdeaCategory {
   category: Category
   id: Int!
@@ -30,6 +21,15 @@ type IdeaCategory {
   categoryId: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+type IdeaFavorite {
+  user: User
+  idea: Idea
+  id: Int!
+  userId: Int!
+  ideaId: Int!
+  createdAt: DateTime!
 }
 
 type IdeaRelationsCount {
@@ -47,6 +47,7 @@ type Idea {
   categories: [Category!]
   favorites: [IdeaFavorite!]
   favoritesCount: Int
+  isMyFavorite: Boolean
   _count: IdeaRelationsCount
   id: Int!
   authorId: Int!

@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt'
 
 import { Category } from '@src/category/models/category.model'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
+import { deepMergeObjects } from '@src/common/helpers/deepMergeObjects.helper'
 import { strictEntries } from '@src/common/helpers/strictEntries.helper'
 import { RequiredNonNull } from '@src/common/types/object.type'
 import { Idea } from '@src/idea/models/idea.model'
@@ -28,8 +29,36 @@ export class UserService {
 
   constructor(private prismaService: PrismaService) {}
 
-  createRelations(fields: Parameters<PrismaService['createRelations']>[0], fieldRelations = this.FIELD_RELATIONS) {
-    return this.prismaService.createRelations<'idea', keyof UserRelations>(fields, fieldRelations)
+  createRelations(
+    fields: Parameters<PrismaService['createRelations']>[0],
+    fieldRelations = this.FIELD_RELATIONS,
+    userId?: number,
+  ) {
+    const newFieldRelations = [...fieldRelations]
+    const ideasRelation = this.FIELD_RELATIONS.find((relation) => relation.field === 'ideas')
+
+    if (ideasRelation && userId !== undefined) {
+      const fieldRelation = deepMergeObjects([
+        ideasRelation,
+        {
+          field: ideasRelation.field,
+          relations: {
+            ideas: {
+              include: {
+                favorites: {
+                  where: {
+                    userId,
+                  },
+                },
+              },
+            },
+          },
+        },
+      ])
+      newFieldRelations.push(fieldRelation)
+    }
+
+    return this.prismaService.createRelations<'user', keyof UserRelations>(fields, newFieldRelations)
   }
 
   formatUser(user: User): User {
@@ -45,8 +74,12 @@ export class UserService {
               .filter((category): category is Category => !!category) ?? [],
           commentsCount: idea?._count?.comments ?? 0,
           favoritesCount: idea?._count?.favorites ?? 0,
+          isMyFavorite: !!idea.favorites?.length,
         }))
-        .filter((idea): idea is RequiredNonNull<Idea, 'categories' | 'commentsCount' | 'favoritesCount'> => !!idea)
+        .filter(
+          (idea): idea is RequiredNonNull<Idea, 'categories' | 'commentsCount' | 'favoritesCount' | 'isMyFavorite'> =>
+            !!idea,
+        )
     }
 
     if (user.ideaFavorites) {
@@ -59,8 +92,12 @@ export class UserService {
               .filter((category): category is Category => !!category) ?? [],
           commentsCount: favorite.idea?._count?.comments ?? 0,
           favoritesCount: favorite.idea?._count?.favorites ?? 0,
+          isMyFavorite: true,
         }))
-        .filter((idea): idea is RequiredNonNull<Idea, 'categories' | 'commentsCount' | 'favoritesCount'> => !!idea)
+        .filter(
+          (idea): idea is RequiredNonNull<Idea, 'categories' | 'commentsCount' | 'favoritesCount' | 'isMyFavorite'> =>
+            !!idea,
+        )
     }
 
     if (user._count) {

@@ -17,6 +17,41 @@ export const FIELD_RELATIONS: Array<{
         orderBy: {
           createdAt: SORT_ORDER.desc,
         },
+        include: {
+          author: true,
+          ideaCategories: {
+            include: {
+              category: true,
+            },
+            orderBy: {
+              category: {
+                id: SORT_ORDER.asc,
+              },
+            },
+          },
+          favorites: {
+            where: {
+              // 利用するときにuserIdを置換する処理が必要
+              userId: '%userId%' as unknown as number,
+            },
+          },
+          _count: {
+            select: {
+              comments: {
+                where: {
+                  deletedAt: null,
+                },
+              },
+              favorites: {
+                where: {
+                  idea: {
+                    deletedAt: null,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
   },

@@ -16,7 +16,7 @@ export class UserResolver {
   @Query(() => User)
   @UseGuards(JwtAuthGuard)
   async user(@RequestedFields() requestedFields: string[], @AuthenticatedUser() user: User): Promise<User> {
-    const relations = this.userService.createRelations(requestedFields)
+    const relations = this.userService.createRelations(requestedFields, this.userService.FIELD_RELATIONS, user.id)
     const resource = await this.userService.getById(user.id, relations)
 
     if (!resource) {

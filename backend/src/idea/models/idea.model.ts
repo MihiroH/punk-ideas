@@ -46,6 +46,9 @@ export class IdeaRelations {
   @Field(() => Int, { nullable: true })
   favoritesCount?: number | null
 
+  @Field(() => Boolean, { nullable: true })
+  isMyFavorite?: boolean | null
+
   @Field(() => IdeaRelationsCount, { nullable: true })
   _count?: IdeaRelationsCount | null
 }
