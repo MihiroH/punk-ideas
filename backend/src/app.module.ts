@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module'
 import { CategoryModule } from './category/category.module'
 import { CommentModule } from './comment/comment.module'
 import { IdeaModule } from './idea/idea.module'
+import { IdeaFavoriteModule } from './ideaFavorite/ideaFavorite.module'
 import { UserModule } from './user/user.module'
 
 @Module({
@@ -21,6 +22,7 @@ import { UserModule } from './user/user.module'
     AuthModule,
     CategoryModule,
     CommentModule,
+    IdeaFavoriteModule,
     IdeaModule,
     UserModule,
   ],

@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common'
-import { Category, Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
+import { Category } from '@src/category/models/category.model'
 import { SORT_ORDER } from '@src/common/constants/sortOrder.constant'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
+import { deepMergeObjects } from '@src/common/helpers/deepMergeObjects.helper'
 import { strictEntries } from '@src/common/helpers/strictEntries.helper'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
@@ -17,6 +19,7 @@ export class IdeaService {
   private readonly COUNT_KEY_FIELD_MAP = {
     comments: 'commentsCount',
     reports: 'reportsCount',
+    favorites: 'favoritesCount',
   } as const
 
   constructor(private prismaService: PrismaService) {}
@@ -24,10 +27,14 @@ export class IdeaService {
   formatIdea(idea: Idea): Idea {
     const result = { ...idea }
 
-    if ('ideaCategories' in idea) {
+    if (idea.ideaCategories) {
       result.categories = idea.ideaCategories
-        ?.map((ideaCategory) => ideaCategory.category)
-        .filter((c): c is Category => !!c)
+        .map((ideaCategory) => ideaCategory.category)
+        .filter((category): category is Category => !!category)
+    }
+
+    if (idea.favorites) {
+      result.isMyFavorite = !!idea.favorites.length
     }
 
     if (idea._count) {
@@ -72,12 +79,39 @@ export class IdeaService {
     return this.formatIdea(resource)
   }
 
-  createRelations(fields: Parameters<PrismaService['createRelations']>[0], fieldRelations = this.FIELD_RELATIONS) {
-    return this.prismaService.createRelations<'idea', keyof IdeaRelations>(fields, fieldRelations)
+  createRelations(
+    fields: Parameters<PrismaService['createRelations']>[0],
+    fieldRelations = this.FIELD_RELATIONS,
+    userId?: number,
+  ) {
+    const newFieldRelations = [...fieldRelations]
+    const relationOfIsMyFavorite = this.FIELD_RELATIONS.find((relation) => relation.field === 'isMyFavorite')
+
+    if (relationOfIsMyFavorite && userId !== undefined) {
+      const fieldRelation = deepMergeObjects([
+        relationOfIsMyFavorite,
+        {
+          field: relationOfIsMyFavorite.field,
+          relations: {
+            favorites: {
+              where: {
+                userId,
+              },
+            },
+          },
+        },
+      ])
+      newFieldRelations.push(fieldRelation)
+    }
+
+    return this.prismaService.createRelations<'idea', keyof IdeaRelations>(fields, newFieldRelations)
   }
 
-  async list(args?: { ideasGetArgs?: IdeasGetArgs; userId?: number }, include?: Prisma.IdeaInclude): Promise<Idea[]> {
-    const { ideasGetArgs, userId } = args ?? {}
+  async list(
+    args?: { ideasGetArgs?: IdeasGetArgs; reporterId?: number },
+    include?: Prisma.IdeaInclude,
+  ): Promise<Idea[]> {
+    const { ideasGetArgs, reporterId } = args ?? {}
     const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
 
     const resources = await this.prismaService.client.idea.findMany({
@@ -86,11 +120,11 @@ export class IdeaService {
         content: { contains: content },
         deletedAt: null,
         reports:
-          includeReportedBySelf || userId === undefined
+          includeReportedBySelf || reporterId === undefined
             ? undefined
             : {
                 none: {
-                  reporterId: userId,
+                  reporterId,
                 },
               },
         ...restArgs,
@@ -102,8 +136,8 @@ export class IdeaService {
     return resources.map((r) => this.formatIdea(r))
   }
 
-  async count(args?: { ideasGetArgs?: IdeasGetArgs; userId?: number }): Promise<number> {
-    const { userId, ideasGetArgs } = args ?? {}
+  async count(args?: { ideasGetArgs?: IdeasGetArgs; reporterId?: number }): Promise<number> {
+    const { reporterId, ideasGetArgs } = args ?? {}
     const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
 
     return await this.prismaService.client.idea.count({
@@ -112,11 +146,11 @@ export class IdeaService {
         content: { contains: content },
         deletedAt: null,
         reports:
-          includeReportedBySelf || userId === undefined
+          includeReportedBySelf || reporterId === undefined
             ? undefined
             : {
                 none: {
-                  reporterId: userId,
+                  reporterId,
                 },
               },
         ...restArgs,

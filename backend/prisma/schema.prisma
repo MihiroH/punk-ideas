@@ -30,8 +30,9 @@ model User {
   pendingEmailChanges PendingEmailChange[]
   ideas               Idea[]
   comments            Comment[]
-  // aiCheckLogs AICheckLog[] // TODO: AIチェック機能を実装するときに有効化する
   reports             Report[]
+  ideaFavorites       IdeaFavorite[]
+  // aiCheckLogs AICheckLog[] // TODO: AIチェック機能を実装するときに有効化する
 
   @@map("m_users")
 }
@@ -66,6 +67,7 @@ model Idea {
   comments       Comment[]
   ideaCategories IdeaCategory[]
   reports        Report[]
+  favorites      IdeaFavorite[]
 
   @@map("t_ideas")
 }
@@ -149,6 +151,19 @@ model ReportReason {
   reports Report[]
 
   @@map("m_report_reasons")
+}
+
+model IdeaFavorite {
+  id        Int      @id @default(autoincrement()) @map("id")
+  userId    Int      @map("user_id")
+  ideaId    Int      @map("idea_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+  idea Idea @relation(fields: [ideaId], references: [id])
+
+  @@unique([userId, ideaId]) // Ensure a user can only favorite an idea once
+  @@map("t_idea_favorites")
 }
 
 // TODO: AIチェック機能を実装するときに有効化する

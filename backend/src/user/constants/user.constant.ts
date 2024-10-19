@@ -17,6 +17,41 @@ export const FIELD_RELATIONS: Array<{
         orderBy: {
           createdAt: SORT_ORDER.desc,
         },
+        include: {
+          author: true,
+          ideaCategories: {
+            include: {
+              category: true,
+            },
+            orderBy: {
+              category: {
+                id: SORT_ORDER.asc,
+              },
+            },
+          },
+          favorites: {
+            where: {
+              // 利用するときにuserIdを置換する処理が必要
+              userId: '%userId%' as unknown as number,
+            },
+          },
+          _count: {
+            select: {
+              comments: {
+                where: {
+                  deletedAt: null,
+                },
+              },
+              favorites: {
+                where: {
+                  idea: {
+                    deletedAt: null,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
   },
@@ -67,6 +102,72 @@ export const FIELD_RELATIONS: Array<{
       _count: {
         select: {
           reports: true,
+        },
+      },
+    },
+  },
+  {
+    field: 'favoriteIdeas',
+    relations: {
+      ideaFavorites: {
+        include: {
+          idea: {
+            include: {
+              author: true,
+              ideaCategories: {
+                include: {
+                  category: true,
+                },
+                orderBy: {
+                  category: {
+                    id: SORT_ORDER.asc,
+                  },
+                },
+              },
+              _count: {
+                select: {
+                  comments: {
+                    where: {
+                      deletedAt: null,
+                    },
+                  },
+                  favorites: {
+                    where: {
+                      idea: {
+                        deletedAt: null,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        where: {
+          idea: {
+            deletedAt: null,
+          },
+        },
+        orderBy: {
+          idea: {
+            createdAt: SORT_ORDER.desc,
+          },
+        },
+      },
+    },
+  },
+  {
+    field: 'favoriteIdeasCount',
+    relations: {
+      _count: {
+        select: {
+          ideaFavorites: {
+            where: {
+              idea: {
+                deletedAt: null,
+              },
+            },
+          },
         },
       },
     },

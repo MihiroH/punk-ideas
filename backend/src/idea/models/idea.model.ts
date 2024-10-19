@@ -4,6 +4,7 @@ import { IsIn } from 'class-validator'
 import { Category } from '@src/category/models/category.model'
 import { Comment } from '@src/comment/models/comment.model'
 import { IdeaCategory } from '@src/ideaCategory/models/ideaCategory.model'
+import { IdeaFavorite } from '@src/ideaFavorite/models/ideaFavorite.model'
 import { User } from '@src/user/models/user.model'
 import { OPEN_LEVELS } from '../constants/idea.constant'
 
@@ -14,6 +15,9 @@ export class IdeaRelationsCount {
 
   @Field(() => Int)
   reports?: number
+
+  @Field(() => Int)
+  favorites?: number
 }
 
 @ObjectType()
@@ -35,6 +39,15 @@ export class IdeaRelations {
 
   @Field(() => [Category], { nullable: true })
   categories?: Category[] | null
+
+  @Field(() => [IdeaFavorite], { nullable: true })
+  favorites?: IdeaFavorite[] | null
+
+  @Field(() => Int, { nullable: true })
+  favoritesCount?: number | null
+
+  @Field(() => Boolean, { nullable: true })
+  isMyFavorite?: boolean | null
 
   @Field(() => IdeaRelationsCount, { nullable: true })
   _count?: IdeaRelationsCount | null

@@ -99,12 +99,13 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     return relations
   }
 
-  async softDeleteWithRelations<ModelName extends CamelCasedModelName = CamelCasedModelName>(
+  async deleteWithRelations<ModelName extends CamelCasedModelName = CamelCasedModelName>(
     modelName: ModelName,
     id: number,
-    relations: RelationNames<Capitalize<ModelName>>[],
+    relations: { softDelete?: RelationNames<Capitalize<ModelName>>[]; delete?: RelationNames<Capitalize<ModelName>>[] },
   ) {
-    const relationsQuery = relations.reduce(
+    // 論理削除用
+    let relationsQuery = relations.softDelete?.reduce(
       (acc, relation) => {
         acc[String(relation)] = {
           updateMany: {
@@ -116,6 +117,14 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
       },
       {} as Record<string, unknown>,
     )
+
+    // 物理削除用
+    relationsQuery = relations.delete?.reduce((acc, relation) => {
+      acc[String(relation)] = {
+        deleteMany: {},
+      }
+      return acc
+    }, relationsQuery ?? {})
 
     const modelDelegate: ModelDelegateForUpdate = this.client[modelName]
 

@@ -73,4 +73,31 @@ export const FIELD_RELATIONS: Array<{
       },
     },
   },
+  {
+    field: 'favoritesCount',
+    relations: {
+      _count: {
+        select: {
+          favorites: {
+            where: {
+              idea: {
+                deletedAt: null,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    field: 'isMyFavorite',
+    relations: {
+      favorites: {
+        where: {
+          // 利用するときにuserIdを置換する処理が必要
+          userId: '%userId%' as unknown as number,
+        },
+      },
+    },
+  },
 ]
