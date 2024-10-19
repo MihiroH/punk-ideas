@@ -58,7 +58,7 @@ export class IdeaResolver {
     if (ideasGetArgs?.includeReportedBySelf === false && user?.id === undefined) {
       throw new CustomBadRequestException([
         {
-          field: 'ideas.argument.includeReportedBySelf',
+          field: 'ideasCount.argument.includeReportedBySelf',
           error: 'Authorization Bearer token is required if includeReportedBySelf argument is false',
         },
       ])
@@ -81,7 +81,7 @@ export class IdeaResolver {
     if (requestedFields.includes('isMyFavorite') && user?.id === undefined) {
       throw new CustomBadRequestException([
         {
-          field: 'ideas.field.isMyFavorite',
+          field: 'idea.field.isMyFavorite',
           error: 'Authorization Bearer token is required if isMyFavorite is requested',
         },
       ])
