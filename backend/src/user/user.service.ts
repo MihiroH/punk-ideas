@@ -37,24 +37,23 @@ export class UserService {
     const newFieldRelations = [...fieldRelations]
     const ideasRelation = this.FIELD_RELATIONS.find((relation) => relation.field === 'ideas')
 
-    if (ideasRelation && userId !== undefined) {
-      const fieldRelation = deepMergeObjects([
-        ideasRelation,
-        {
-          field: ideasRelation.field,
-          relations: {
-            ideas: {
-              include: {
-                favorites: {
-                  where: {
-                    userId,
-                  },
+    if (ideasRelation) {
+      const fieldRelation = deepMergeObjects(
+        [
+          ideasRelation,
+          {
+            field: ideasRelation.field,
+            relations: {
+              ideas: {
+                include: {
+                  favorites: userId === undefined ? undefined : { where: { userId } },
                 },
               },
             },
           },
-        },
-      ])
+        ],
+        { deleteIfUndefinedIsSpecified: true },
+      )
       newFieldRelations.push(fieldRelation)
     }
 
