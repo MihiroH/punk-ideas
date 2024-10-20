@@ -5,7 +5,7 @@ import { Request } from 'express'
 import { AuthenticatedUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { OptionalJwtAuthGuard } from '@src/auth/guards/optionalJwtAuth.guard'
-import { RequestedFields } from '@src/common/decorators/requestedFields.decorator'
+import { RequestedFields, RequestedFieldsMap } from '@src/common/decorators/requestedFields.decorator'
 import { CustomBadRequestException } from '@src/common/errors/customBadRequest.exception'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { User } from '@src/user/models/user.model'
@@ -21,29 +21,39 @@ export class IdeaResolver {
   @Query(() => [Idea], { nullable: true })
   @UseGuards(OptionalJwtAuthGuard)
   async ideas(
-    @RequestedFields() requestedFields: string[],
+    @RequestedFields() requestedFields: RequestedFieldsMap,
     @Args() ideasGetArgs?: IdeasGetArgs,
     @AuthenticatedUser() user?: User,
   ): Promise<Idea[]> {
-    if (ideasGetArgs?.includeReportedBySelf === false && user?.id === undefined) {
-      throw new CustomBadRequestException([
-        {
+    CustomBadRequestException.validateOrThrow([
+      {
+        condition: ideasGetArgs?.includeReportedBySelf === false && user?.id === undefined,
+        message: {
           field: 'ideas.argument.includeReportedBySelf',
-          error: 'Authorization Bearer token is required if includeReportedBySelf argument is false',
+          error: "Authorization Bearer token is required if 'includeReportedBySelf' is set to false",
         },
-      ])
-    }
-
-    if (requestedFields.includes('isMyFavorite') && user?.id === undefined) {
-      throw new CustomBadRequestException([
-        {
+      },
+      {
+        condition: requestedFields.isMyFavorite && user?.id === undefined,
+        message: {
           field: 'ideas.field.isMyFavorite',
-          error: 'Authorization Bearer token is required if isMyFavorite is requested',
+          error: 'Authorization Bearer token is required if ideas.isMyFavorite field is requested',
         },
-      ])
-    }
+      },
+      {
+        condition: requestedFields.comments?.isMyFavorite && user?.id === undefined,
+        message: {
+          field: 'ideas.field.comments.isMyFavorite',
+          error: 'Authorization Bearer token is required if ideas.comments.isMyFavorite field is requested',
+        },
+      },
+    ])
 
-    const relations = this.ideaService.createRelations(requestedFields, this.ideaService.FIELD_RELATIONS, user?.id)
+    const relations = this.ideaService.createRelations(
+      Object.keys(requestedFields),
+      this.ideaService.FIELD_RELATIONS,
+      user?.id,
+    )
 
     if (user) {
       return await this.ideaService.list({ ideasGetArgs, reporterId: user?.id }, relations)
@@ -55,14 +65,15 @@ export class IdeaResolver {
   @Query(() => Int)
   @UseGuards(OptionalJwtAuthGuard)
   async ideasCount(@Args() ideasGetArgs?: IdeasGetArgs, @AuthenticatedUser() user?: User): Promise<number> {
-    if (ideasGetArgs?.includeReportedBySelf === false && user?.id === undefined) {
-      throw new CustomBadRequestException([
-        {
+    CustomBadRequestException.validateOrThrow([
+      {
+        condition: ideasGetArgs?.includeReportedBySelf === false && user?.id === undefined,
+        message: {
           field: 'ideasCount.argument.includeReportedBySelf',
-          error: 'Authorization Bearer token is required if includeReportedBySelf argument is false',
+          error: "Authorization Bearer token is required if 'includeReportedBySelf' is set to false",
         },
-      ])
-    }
+      },
+    ])
 
     if (user) {
       return await this.ideaService.count({ ideasGetArgs, reporterId: user?.id })
@@ -74,20 +85,25 @@ export class IdeaResolver {
   @Query(() => Idea)
   @UseGuards(OptionalJwtAuthGuard)
   async idea(
-    @RequestedFields() requestedFields: string[],
+    @RequestedFields() requestedFields: RequestedFieldsMap,
     @Args('id', { type: () => Int }) id: number,
     @AuthenticatedUser() user?: User,
   ): Promise<Idea> {
-    if (requestedFields.includes('isMyFavorite') && user?.id === undefined) {
-      throw new CustomBadRequestException([
-        {
+    CustomBadRequestException.validateOrThrow([
+      {
+        condition: requestedFields.isMyFavorite && user?.id === undefined,
+        message: {
           field: 'idea.field.isMyFavorite',
-          error: 'Authorization Bearer token is required if isMyFavorite is requested',
+          error: 'Authorization Bearer token is required if idea.isMyFavorite field is requested',
         },
-      ])
-    }
+      },
+    ])
 
-    const relations = this.ideaService.createRelations(requestedFields, this.ideaService.FIELD_RELATIONS, user?.id)
+    const relations = this.ideaService.createRelations(
+      Object.keys(requestedFields),
+      this.ideaService.FIELD_RELATIONS,
+      user?.id,
+    )
     const resource = await this.ideaService.getById(id, relations)
 
     if (!resource) {

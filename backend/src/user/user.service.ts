@@ -30,35 +30,34 @@ export class UserService {
   constructor(private prismaService: PrismaService) {}
 
   createRelations(
-    fields: Parameters<PrismaService['createRelations']>[0],
+    requestedFields: Parameters<PrismaService['createRelations']>[0],
     fieldRelations = this.FIELD_RELATIONS,
     userId?: number,
   ) {
     const newFieldRelations = [...fieldRelations]
     const ideasRelation = this.FIELD_RELATIONS.find((relation) => relation.field === 'ideas')
 
-    if (ideasRelation && userId !== undefined) {
-      const fieldRelation = deepMergeObjects([
-        ideasRelation,
-        {
-          field: ideasRelation.field,
-          relations: {
-            ideas: {
-              include: {
-                favorites: {
-                  where: {
-                    userId,
-                  },
+    if (ideasRelation) {
+      const fieldRelation = deepMergeObjects(
+        [
+          ideasRelation,
+          {
+            field: ideasRelation.field,
+            relations: {
+              ideas: {
+                include: {
+                  favorites: userId === undefined ? undefined : { where: { userId } },
                 },
               },
             },
           },
-        },
-      ])
+        ],
+        { deleteUndefinedProps: true },
+      )
       newFieldRelations.push(fieldRelation)
     }
 
-    return this.prismaService.createRelations<'user', keyof UserRelations>(fields, newFieldRelations)
+    return this.prismaService.createRelations<'user', keyof UserRelations>(requestedFields, newFieldRelations)
   }
 
   formatUser(user: User): User {

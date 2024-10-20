@@ -4,7 +4,7 @@ import { isObject } from './typeCheck'
 type NestedObject = Record<string, unknown>
 
 interface Options {
-  deleteIfUndefinedIsSpecified?: boolean
+  deleteUndefinedProps?: boolean
 }
 
 /*
@@ -26,7 +26,7 @@ export const deepMergeObjects = <T extends NestedObject[]>(objects: T, options?:
         // オブジェクトである場合は再帰的にマージする
         if (isObject(value)) {
           acc[key] = deepMergeObjects([isObject(currentValue) ? currentValue : {}, value], options)
-        } else if (options?.deleteIfUndefinedIsSpecified && typeof value === 'undefined') {
+        } else if (options?.deleteUndefinedProps && typeof value === 'undefined') {
           // undefinedの場合は削除
           delete acc[key]
         } else {
