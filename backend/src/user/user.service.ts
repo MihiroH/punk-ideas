@@ -52,7 +52,7 @@ export class UserService {
             },
           },
         ],
-        { deleteIfUndefinedIsSpecified: true },
+        { deleteUndefinedProps: true },
       )
       newFieldRelations.push(fieldRelation)
     }

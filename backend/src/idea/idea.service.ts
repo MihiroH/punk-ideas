@@ -106,7 +106,7 @@ export class IdeaService {
             },
           },
         ],
-        { deleteIfUndefinedIsSpecified: true },
+        { deleteUndefinedProps: true },
       )
       newFieldRelations.push(fieldRelation)
     }
@@ -128,7 +128,7 @@ export class IdeaService {
             },
           },
         ],
-        { deleteIfUndefinedIsSpecified: true },
+        { deleteUndefinedProps: true },
       )
       newFieldRelations.push(fieldRelation)
     }
