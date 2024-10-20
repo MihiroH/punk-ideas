@@ -25,7 +25,7 @@ const parseRequestedFields = (fieldNodes: FieldNode[]): RequestedFieldsMap => {
 }
 
 /* GraphQLのリクエストでリクエストされたフィールドを取得するデコレータ
- * モデルに対してリクエストされたフィールドを再帰的に取得し、ネストされたマップを返します。
+ * モデルに対してリクエストされたフィールドを再帰的に取得し、ネストされたマップを返す
  *
  * @returns {RequestedFieldsMap} リクエストされたフィールドのマップ
  *
