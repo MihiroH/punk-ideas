@@ -74,10 +74,12 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   }
 
   createRelations<ModelName extends CamelCasedModelName, FieldNames extends string>(
-    fields: string[],
+    requestedFields: string[],
     fieldRelations: Array<{ field: FieldNames; relations: PrismaInclude<ModelName> }>,
   ): PrismaInclude<ModelName> {
-    const filteredFields = fieldRelations.filter((item) => fields.includes(item.field)).map((item) => item.field)
+    const filteredFields = fieldRelations
+      .filter((item) => requestedFields.includes(item.field))
+      .map((item) => item.field)
     const relations = filteredFields.reduce(
       (acc, field: FieldNames) => {
         // fieldに対応するrelationsを取得するが、同じfieldのrelationsが複数ある場合は最後のものを取得する

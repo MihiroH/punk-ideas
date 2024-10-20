@@ -30,7 +30,7 @@ export class UserService {
   constructor(private prismaService: PrismaService) {}
 
   createRelations(
-    fields: Parameters<PrismaService['createRelations']>[0],
+    requestedFields: Parameters<PrismaService['createRelations']>[0],
     fieldRelations = this.FIELD_RELATIONS,
     userId?: number,
   ) {
@@ -58,7 +58,7 @@ export class UserService {
       newFieldRelations.push(fieldRelation)
     }
 
-    return this.prismaService.createRelations<'user', keyof UserRelations>(fields, newFieldRelations)
+    return this.prismaService.createRelations<'user', keyof UserRelations>(requestedFields, newFieldRelations)
   }
 
   formatUser(user: User): User {

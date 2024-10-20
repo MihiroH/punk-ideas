@@ -1,14 +1,36 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common'
 import { GqlExecutionContext } from '@nestjs/graphql'
-import { GraphQLResolveInfo, SelectionNode } from 'graphql'
+import { FieldNode, GraphQLResolveInfo } from 'graphql'
+
+export interface RequestedFieldsMap {
+  [key: string]: RequestedFieldsMap
+}
+
+const parseRequestedFields = (fieldNodes: FieldNode[]): RequestedFieldsMap => {
+  return fieldNodes.reduce<RequestedFieldsMap>((fields, node) => {
+    if (node.selectionSet) {
+      for (const selection of node.selectionSet.selections) {
+        if (selection.kind === 'Field') {
+          const fieldName = selection.name.value
+          if (selection.selectionSet) {
+            fields[fieldName] = parseRequestedFields([selection])
+          } else {
+            fields[fieldName] = {}
+          }
+        }
+      }
+    }
+    return fields
+  }, {})
+}
 
 /* GraphQLのリクエストでリクエストされたフィールドを取得するデコレータ
- * モデルに対してリクエストされた1階層目のフィールドを取得する
+ * モデルに対してリクエストされたフィールドを再帰的に取得し、ネストされたマップを返します。
  *
- * @returns {string[]} リクエストされたフィールドの配列
+ * @returns {RequestedFieldsMap} リクエストされたフィールドのマップ
  *
  * @example
- * リクエストされたフィールドが以下の場合、['id', 'name', 'ideas']を返す
+ * 以下のようなGraphQLクエリがリクエストされた場合：
  *
  * user {
  *   id
@@ -18,14 +40,21 @@ import { GraphQLResolveInfo, SelectionNode } from 'graphql'
  *     title
  *   }
  * }
+ *
+ * デコレータは以下のようなオブジェクトを返す：
+ * {
+ *   id: {},
+ *   name: {},
+ *   ideas: {
+ *     id: {},
+ *     title: {}
+ *   }
+ * }
  */
-export const RequestedFields = createParamDecorator((_data: unknown, context: ExecutionContext): string[] => {
+export const RequestedFields = createParamDecorator((_data: unknown, context: ExecutionContext): RequestedFieldsMap => {
   const ctx = GqlExecutionContext.create(context)
   const info: GraphQLResolveInfo = ctx.getInfo()
+  const parsedFields = parseRequestedFields([...info.fieldNodes])
 
-  const fields = info.fieldNodes[0].selectionSet?.selections
-    .map((field: SelectionNode) => ('name' in field ? field.name.value : ''))
-    .filter(Boolean)
-
-  return fields ?? []
+  return parsedFields
 })

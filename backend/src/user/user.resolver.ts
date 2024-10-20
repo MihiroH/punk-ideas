@@ -3,7 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 
 import { AuthenticatedUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
-import { RequestedFields } from '@src/common/decorators/requestedFields.decorator'
+import { RequestedFields, RequestedFieldsMap } from '@src/common/decorators/requestedFields.decorator'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { User } from '@src/user/models/user.model'
 import { UserProfileUpdateInput } from './dto/userProfileUpdate.input'
@@ -15,8 +15,12 @@ export class UserResolver {
 
   @Query(() => User)
   @UseGuards(JwtAuthGuard)
-  async user(@RequestedFields() requestedFields: string[], @AuthenticatedUser() user: User): Promise<User> {
-    const relations = this.userService.createRelations(requestedFields, this.userService.FIELD_RELATIONS, user.id)
+  async user(@RequestedFields() requestedFields: RequestedFieldsMap, @AuthenticatedUser() user: User): Promise<User> {
+    const relations = this.userService.createRelations(
+      Object.keys(requestedFields),
+      this.userService.FIELD_RELATIONS,
+      user.id,
+    )
     const resource = await this.userService.getById(user.id, relations)
 
     if (!resource) {
