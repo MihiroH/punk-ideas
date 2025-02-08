@@ -13,6 +13,12 @@
 
 ## セットアップ
 
+### 環境変数の設定
+
+```bash
+$ cp .env.example .env
+```
+
 ### docker containerの起動
 
 ```bash
