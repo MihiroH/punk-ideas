@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 
 import { PrismaService } from '@src/prisma/prisma.service'
-import { CommentFavorite } from './models/commentFavorite.model'
+import { CommentFavorite } from './commentFavorite.model'
 
 @Injectable()
 export class CommentFavoriteService {

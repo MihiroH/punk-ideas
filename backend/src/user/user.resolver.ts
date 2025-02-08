@@ -5,7 +5,7 @@ import { AuthenticatedUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
 import { RequestedFields, RequestedFieldsMap } from '@src/common/decorators/requestedFields.decorator'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
-import { User } from '@src/user/models/user.model'
+import { User } from '@src/user/user.model'
 import { UserProfileUpdateInput } from './dto/userProfileUpdate.input'
 import { UserService } from './user.service'
 

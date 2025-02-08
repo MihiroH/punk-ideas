@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 
-import { Category } from '@src/category/models/category.model'
+import { Category } from '@src/category/category.model'
 import { SORT_ORDER } from '@src/common/constants/sortOrder.constant'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { deepMergeObjects } from '@src/common/helpers/deepMergeObjects.helper'
@@ -11,7 +11,7 @@ import { PrismaService } from '@src/prisma/prisma.service'
 import { FIELD_RELATIONS } from './constants/idea.constant'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
 import { IdeasGetArgs } from './dto/ideasGet.args'
-import { Idea, IdeaRelations } from './models/idea.model'
+import { Idea, IdeaRelations } from './idea.model'
 
 @Injectable()
 export class IdeaService {

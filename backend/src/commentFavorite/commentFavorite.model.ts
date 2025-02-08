@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
 
-import { Comment } from '@src/comment/models/comment.model'
-import { User } from '@src/user/models/user.model'
+import { Comment } from '@src/comment/comment.model'
+import { User } from '@src/user/user.model'
 
 @ObjectType()
 export class CommentFavoriteRelations {
