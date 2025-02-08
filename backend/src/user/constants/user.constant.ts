@@ -29,6 +29,7 @@ export const FIELD_RELATIONS: Array<{
               },
             },
           },
+          ideaFiles: true,
           favorites: {
             where: {
               // 利用するときにuserIdを置換する処理が必要

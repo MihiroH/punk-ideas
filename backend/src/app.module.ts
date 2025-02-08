@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module'
 import { CategoryModule } from './category/category.module'
 import { CommentModule } from './comment/comment.module'
 import { CommentFavoriteModule } from './commentFavorite/commentFavorite.module'
+import { FileModule } from './file/file.module'
 import { IdeaModule } from './idea/idea.module'
 import { IdeaFavoriteModule } from './ideaFavorite/ideaFavorite.module'
 import { UserModule } from './user/user.module'
@@ -24,6 +25,7 @@ import { UserModule } from './user/user.module'
     CategoryModule,
     CommentModule,
     CommentFavoriteModule,
+    FileModule,
     IdeaFavoriteModule,
     IdeaModule,
     UserModule,

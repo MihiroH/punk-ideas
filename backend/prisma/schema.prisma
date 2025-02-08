@@ -113,10 +113,8 @@ model IdeaFavorite {
 model IdeaFile {
   id        Int      @id @default(autoincrement()) @map("id")
   ideaId    Int      @map("idea_id")
-  fileName  String   @map("file_name")
   filePath  String   @map("file_path")
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
 
   idea Idea @relation(fields: [ideaId], references: [id])
 

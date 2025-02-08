@@ -33,6 +33,10 @@ export class IdeaService {
         .filter((category): category is Category => !!category)
     }
 
+    if (idea.ideaFiles) {
+      result.files = idea.ideaFiles
+    }
+
     if (idea.favorites) {
       result.isMyFavorite = !!idea.favorites.length
     }
@@ -56,7 +60,7 @@ export class IdeaService {
   }
 
   async create(data: IdeaCreateInput, authorId: number, authorIp: string): Promise<Idea> {
-    const { categoryIds, ...restData } = data
+    const { categoryIds, filePaths, ...restData } = data
     const resource = await this.prismaService.client.idea.create({
       data: {
         ...restData,
@@ -67,6 +71,11 @@ export class IdeaService {
             category: {
               connect: { id: categoryId },
             },
+          })),
+        },
+        ideaFiles: {
+          create: filePaths?.map((filePath) => ({
+            filePath,
           })),
         },
       },
@@ -81,6 +90,7 @@ export class IdeaService {
             },
           },
         },
+        ideaFiles: true,
       },
     })
 
