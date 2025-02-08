@@ -41,6 +41,15 @@ type IdeaFavorite {
   createdAt: DateTime!
 }
 
+type IdeaFile {
+  user: User
+  idea: Idea
+  id: Int!
+  ideaId: Int!
+  filePath: String!
+  createdAt: DateTime!
+}
+
 type IdeaRelationsCount {
   comments: Int!
   reports: Int!
@@ -54,6 +63,8 @@ type Idea {
   reportsCount: Int
   ideaCategories: [IdeaCategory!]
   categories: [Category!]
+  ideaFiles: [IdeaFile!]
+  files: [IdeaFile!]
   favorites: [IdeaFavorite!]
   favoritesCount: Int
   isMyFavorite: Boolean
@@ -186,4 +197,5 @@ input IdeaCreateInput {
   content: String!
   openLevel: Int
   categoryIds: [Int!]!
+  filePaths: [String!]
 }

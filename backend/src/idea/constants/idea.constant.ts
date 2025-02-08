@@ -34,6 +34,12 @@ export const FIELD_RELATIONS: Array<{
     },
   },
   {
+    field: 'files',
+    relations: {
+      ideaFiles: true,
+    },
+  },
+  {
     field: 'comments',
     relations: {
       comments: {

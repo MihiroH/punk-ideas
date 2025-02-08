@@ -71,13 +71,18 @@ export class UserService {
             idea?.ideaCategories
               ?.map((ideaCategory) => ideaCategory.category)
               .filter((category): category is Category => !!category) ?? [],
+          files: idea.ideaFiles ?? [],
           commentsCount: idea?._count?.comments ?? 0,
           favoritesCount: idea?._count?.favorites ?? 0,
           isMyFavorite: !!idea.favorites?.length,
         }))
         .filter(
-          (idea): idea is RequiredNonNull<Idea, 'categories' | 'commentsCount' | 'favoritesCount' | 'isMyFavorite'> =>
-            !!idea,
+          (
+            idea,
+          ): idea is RequiredNonNull<
+            Idea,
+            'categories' | 'files' | 'commentsCount' | 'favoritesCount' | 'isMyFavorite'
+          > => !!idea,
         )
     }
 

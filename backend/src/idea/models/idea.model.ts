@@ -5,6 +5,7 @@ import { Category } from '@src/category/models/category.model'
 import { Comment } from '@src/comment/models/comment.model'
 import { IdeaCategory } from '@src/ideaCategory/models/ideaCategory.model'
 import { IdeaFavorite } from '@src/ideaFavorite/models/ideaFavorite.model'
+import { IdeaFile } from '@src/ideaFile/models/ideaFile.model'
 import { User } from '@src/user/models/user.model'
 import { OPEN_LEVELS } from '../constants/idea.constant'
 
@@ -39,6 +40,12 @@ export class IdeaRelations {
 
   @Field(() => [Category], { nullable: true })
   categories?: Category[] | null
+
+  @Field(() => [IdeaFile], { nullable: true })
+  ideaFiles?: IdeaFile[] | null
+
+  @Field(() => [IdeaFile], { nullable: true })
+  files?: IdeaFile[] | null
 
   @Field(() => [IdeaFavorite], { nullable: true })
   favorites?: IdeaFavorite[] | null

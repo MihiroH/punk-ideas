@@ -23,12 +23,21 @@ export class MailService {
     const mailFromAddress: string | undefined = this.configService.get('MAIL_FROM_ADDRESS')
     const tokenExpirationTime: string | undefined = this.configService.get('JWT_EXPIRES_IN')
 
+    const undefinedEnvVars: string[] = []
+
     if (!mailFromAddress) {
-      throw new CustomInternalServerErrorException('MAIL_FROM_ADDRESS is not defined in the environment variables')
+      undefinedEnvVars.push('MAIL_FROM_ADDRESS')
     }
 
     if (!tokenExpirationTime) {
-      throw new CustomInternalServerErrorException('JWT_EXPIRES_IN is not defined in the environment variables')
+      undefinedEnvVars.push('JWT_EXPIRES_IN')
+    }
+
+    // !mailFromAddress || !tokenExpirationTimeのチェックは本来不要だが、後の行でtsエラーになってしまうため追加
+    if (undefinedEnvVars.length > 0 || !mailFromAddress || !tokenExpirationTime) {
+      throw new CustomInternalServerErrorException(
+        `${undefinedEnvVars.join(', ')} is not defined in the environment variables`,
+      )
     }
 
     this.fromAddress = mailFromAddress

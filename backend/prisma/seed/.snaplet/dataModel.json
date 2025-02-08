@@ -1103,20 +1103,6 @@
           "maxLength": null
         },
         {
-          "id": "public.t_idea_files.file_name",
-          "name": "file_name",
-          "columnName": "file_name",
-          "type": "text",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "id": "public.t_idea_files.file_path",
           "name": "file_path",
           "columnName": "file_path",
@@ -1141,20 +1127,6 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": true,
-          "isId": false,
-          "maxLength": null
-        },
-        {
-          "id": "public.t_idea_files.updated_at",
-          "name": "updated_at",
-          "columnName": "updated_at",
-          "type": "timestamp",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
           "isId": false,
           "maxLength": null
         },

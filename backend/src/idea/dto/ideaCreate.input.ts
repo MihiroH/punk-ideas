@@ -22,4 +22,9 @@ export class IdeaCreateInput {
   @ArrayNotEmpty()
   @ArrayUnique()
   categoryIds: number[]
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @ArrayUnique()
+  filePaths?: string[]
 }
