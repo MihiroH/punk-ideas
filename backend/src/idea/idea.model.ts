@@ -1,13 +1,13 @@
 import { Field, HideField, Int, ObjectType } from '@nestjs/graphql'
 import { IsIn } from 'class-validator'
 
-import { Category } from '@src/category/models/category.model'
-import { Comment } from '@src/comment/models/comment.model'
-import { IdeaCategory } from '@src/ideaCategory/models/ideaCategory.model'
-import { IdeaFavorite } from '@src/ideaFavorite/models/ideaFavorite.model'
-import { IdeaFile } from '@src/ideaFile/models/ideaFile.model'
-import { User } from '@src/user/models/user.model'
-import { OPEN_LEVELS } from '../constants/idea.constant'
+import { Category } from '@src/category/category.model'
+import { Comment } from '@src/comment/comment.model'
+import { IdeaCategory } from '@src/ideaCategory/ideaCategory.model'
+import { IdeaFavorite } from '@src/ideaFavorite/ideaFavorite.model'
+import { IdeaFile } from '@src/ideaFile/ideaFile.model'
+import { User } from '@src/user/user.model'
+import { OPEN_LEVELS } from './constants/idea.constant'
 
 @ObjectType()
 export class IdeaRelationsCount {

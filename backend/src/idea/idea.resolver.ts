@@ -8,11 +8,11 @@ import { OptionalJwtAuthGuard } from '@src/auth/guards/optionalJwtAuth.guard'
 import { RequestedFields, RequestedFieldsMap } from '@src/common/decorators/requestedFields.decorator'
 import { CustomBadRequestException } from '@src/common/errors/customBadRequest.exception'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
-import { User } from '@src/user/models/user.model'
+import { User } from '@src/user/user.model'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
 import { IdeasGetArgs } from './dto/ideasGet.args'
+import { Idea } from './idea.model'
 import { IdeaService } from './idea.service'
-import { Idea } from './models/idea.model'
 
 @Resolver()
 export class IdeaResolver {

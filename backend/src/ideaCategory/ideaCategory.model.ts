@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql'
 
-import { Category } from '@src/category/models/category.model'
+import { Category } from '@src/category/category.model'
 
 @ObjectType()
 export class IdeaCategoryRelations {

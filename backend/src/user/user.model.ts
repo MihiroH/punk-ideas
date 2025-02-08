@@ -1,8 +1,8 @@
 import { Field, HideField, Int, ObjectType } from '@nestjs/graphql'
 
-import { Comment } from '@src/comment/models/comment.model'
-import { Idea } from '@src/idea/models/idea.model'
-import { IdeaFavorite } from '@src/ideaFavorite/models/ideaFavorite.model'
+import { Comment } from '@src/comment/comment.model'
+import { Idea } from '@src/idea/idea.model'
+import { IdeaFavorite } from '@src/ideaFavorite/ideaFavorite.model'
 
 @ObjectType()
 export class UserRelationsCount {

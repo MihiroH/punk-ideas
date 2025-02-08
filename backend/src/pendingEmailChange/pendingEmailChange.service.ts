@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
-import { PendingEmailChange } from './models/pendingEmailChange.model'
+import { PendingEmailChange } from './pendingEmailChange.model'
 
 @Injectable()
 export class PendingEmailChangeService {

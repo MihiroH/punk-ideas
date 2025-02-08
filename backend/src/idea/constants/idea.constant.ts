@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 
 import { SORT_ORDER } from '@src/common/constants/sortOrder.constant'
-import { IdeaRelations } from '../models/idea.model'
+import { IdeaRelations } from '../idea.model'
 
 export const OPEN_LEVELS = {
   private: 0,

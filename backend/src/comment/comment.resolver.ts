@@ -4,10 +4,10 @@ import { Request } from 'express'
 
 import { AuthenticatedUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
-import { User } from '@src/user/models/user.model'
+import { User } from '@src/user/user.model'
+import { Comment } from './comment.model'
 import { CommentService } from './comment.service'
 import { CommentCreateInput } from './dto/commentCreate.input'
-import { Comment } from './models/comment.model'
 
 @Resolver()
 export class CommentResolver {

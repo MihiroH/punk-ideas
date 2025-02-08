@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql'
 
-import { User } from '@src/user/models/user.model'
+import { User } from '@src/user/user.model'
 import { AuthService } from './auth.service'
 import { AuthenticatedUser } from './decorators/currentUser.decorator'
 import { EmailChangeRequestInput } from './dto/emailChangeRequest.input'

@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
-import { Category } from '@src/category/models/category.model'
+import { Category } from '@src/category/category.model'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { deepMergeObjects } from '@src/common/helpers/deepMergeObjects.helper'
 import { strictEntries } from '@src/common/helpers/strictEntries.helper'
 import { RequiredNonNull } from '@src/common/types/object.type'
-import { Idea } from '@src/idea/models/idea.model'
+import { Idea } from '@src/idea/idea.model'
 import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
 import { RelationNames } from '@src/prisma/types/prisma.type'
@@ -15,7 +15,7 @@ import { FIELD_RELATIONS } from './constants/user.constant'
 import { UserCreateInput } from './dto/userCreate.input'
 import { UserProfileUpdateInput } from './dto/userProfileUpdate.input'
 import { EmailAlreadyExistsException } from './errors/emailAlreadyExists.exception'
-import { User, UserRelations } from './models/user.model'
+import { User, UserRelations } from './user.model'
 
 @Injectable()
 export class UserService {

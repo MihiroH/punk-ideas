@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 
-import { User } from '@src/user/models/user.model'
+import { User } from '@src/user/user.model'
 import { UserService } from '@src/user/user.service'
 import { AuthService } from '../auth.service'
 import { CustomUnauthorizedException } from '../errors/customUnauthorized.exception'

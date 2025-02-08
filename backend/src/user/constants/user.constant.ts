@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 
 import { SORT_ORDER } from '@src/common/constants/sortOrder.constant'
-import { UserRelations } from '../models/user.model'
+import { UserRelations } from '../user.model'
 
 export const FIELD_RELATIONS: Array<{
   field: keyof UserRelations

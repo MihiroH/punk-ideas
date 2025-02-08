@@ -3,9 +3,9 @@ import { Args, Int, Mutation, Resolver } from '@nestjs/graphql'
 
 import { AuthenticatedUser } from '@src/auth/decorators/currentUser.decorator'
 import { JwtAuthGuard } from '@src/auth/guards/jwtAuth.guard'
-import { User } from '@src/user/models/user.model'
+import { User } from '@src/user/user.model'
+import { IdeaFavorite } from './ideaFavorite.model'
 import { IdeaFavoriteService } from './ideaFavorite.service'
-import { IdeaFavorite } from './models/ideaFavorite.model'
 
 @Resolver()
 export class IdeaFavoriteResolver {
