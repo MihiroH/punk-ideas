@@ -1,5 +1,7 @@
 import { FileValidator } from '@nestjs/common'
 
+import { formatFileSize } from '../helpers/formatFileSize'
+
 export class FileSizeValidationPipe extends FileValidator<{ maxSize: number }> {
   constructor(private readonly maxSize: number) {
     super({ maxSize })
@@ -10,6 +12,6 @@ export class FileSizeValidationPipe extends FileValidator<{ maxSize: number }> {
   }
 
   buildErrorMessage(): string {
-    return `File size should not exceed ${this.maxSize / 1024 / 1024}MB`
+    return `File size should not exceed ${formatFileSize(this.maxSize)}`
   }
 }

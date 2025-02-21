@@ -13,7 +13,9 @@ import { IMailService } from './types/mailService.interface'
 export class MailService {
   private mailService: IMailService
   private fromAddress: string
-  private tokenExpirationTime: string
+  private tokenExpiresIn: string
+  private registrationVerificationUrl: string
+  private changeEmailVerificationUrl: string
 
   constructor(
     private configService: ConfigService,
@@ -21,7 +23,9 @@ export class MailService {
     private mailPitService: MailPitService,
   ) {
     const mailFromAddress: string | undefined = this.configService.get('MAIL_FROM_ADDRESS')
-    const tokenExpirationTime: string | undefined = this.configService.get('JWT_EXPIRES_IN')
+    const tokenExpiresIn: string | undefined = this.configService.get('JWT_EMAIL_EXPIRES_IN')
+    const registrationVerificationUrl: string | undefined = this.configService.get('MAIL_REGISTRATION_VERIFICATION_URL')
+    const changeEmailVerificationUrl: string | undefined = this.configService.get('MAIL_CHANGE_EMAIL_VERIFICATION_URL')
 
     const undefinedEnvVars: string[] = []
 
@@ -29,19 +33,35 @@ export class MailService {
       undefinedEnvVars.push('MAIL_FROM_ADDRESS')
     }
 
-    if (!tokenExpirationTime) {
-      undefinedEnvVars.push('JWT_EXPIRES_IN')
+    if (!tokenExpiresIn) {
+      undefinedEnvVars.push('JWT_EMAIL_EXPIRES_IN')
     }
 
-    // !mailFromAddress || !tokenExpirationTimeのチェックは本来不要だが、後の行でtsエラーになってしまうため追加
-    if (undefinedEnvVars.length > 0 || !mailFromAddress || !tokenExpirationTime) {
+    if (!registrationVerificationUrl) {
+      undefinedEnvVars.push('MAIL_REGISTRATION_VERIFICATION_URL')
+    }
+
+    if (!changeEmailVerificationUrl) {
+      undefinedEnvVars.push('MAIL_CHANGE_EMAIL_VERIFICATION_URL')
+    }
+
+    // undefinedEnvVars.length > 0 以外のチェックは本来不要だが、後の行でtsエラーになってしまうため追加
+    if (
+      undefinedEnvVars.length > 0 ||
+      !mailFromAddress ||
+      !tokenExpiresIn ||
+      !registrationVerificationUrl ||
+      !changeEmailVerificationUrl
+    ) {
       throw new CustomInternalServerErrorException(
         `${undefinedEnvVars.join(', ')} is not defined in the environment variables`,
       )
     }
 
     this.fromAddress = mailFromAddress
-    this.tokenExpirationTime = tokenExpirationTime
+    this.tokenExpiresIn = tokenExpiresIn
+    this.registrationVerificationUrl = registrationVerificationUrl
+    this.changeEmailVerificationUrl = changeEmailVerificationUrl
 
     switch (this.configService.get('NODE_ENV')) {
       case 'production':
@@ -54,14 +74,13 @@ export class MailService {
   }
 
   sendRegistrationVerificationEmail(email: string, token: string, username?: string): Promise<boolean> {
-    const mailVerificationUrl = this.configService.get('MAIL_REGISTRATION_VERIFICATION_URL')
     const sendEmailOptions = createSendVerificationEmailOptions({
       username,
       fromAddress: this.fromAddress,
       toAddress: email,
-      mailVerificationUrl,
+      mailVerificationUrl: this.registrationVerificationUrl,
       token,
-      tokenExpirationTime: this.tokenExpirationTime,
+      tokenExpiresIn: this.tokenExpiresIn,
       subject: registrationVerificationTemplate.subject,
       bodyTemplate: registrationVerificationTemplate.body,
     })
@@ -70,14 +89,13 @@ export class MailService {
   }
 
   sendEmailChangeVerificationEmail(email: string, token: string, username?: string): Promise<boolean> {
-    const mailVerificationUrl = this.configService.get('MAIL_CHANGE_EMAIL_VERIFICATION_URL')
     const sendEmailOptions = createSendVerificationEmailOptions({
       username,
       fromAddress: this.fromAddress,
       toAddress: email,
-      mailVerificationUrl,
+      mailVerificationUrl: this.changeEmailVerificationUrl,
       token,
-      tokenExpirationTime: this.tokenExpirationTime,
+      tokenExpiresIn: this.tokenExpiresIn,
       subject: emailChangeVerificationTemplate.subject,
       bodyTemplate: emailChangeVerificationTemplate.body,
     })

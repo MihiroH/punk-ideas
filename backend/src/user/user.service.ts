@@ -181,6 +181,15 @@ export class UserService {
     return await this.update({ where: { id }, data: { email: newEmail } })
   }
 
+  async updateRefreshToken(id: number, refreshToken: string): Promise<User> {
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10)
+    return await this.update({ where: { id }, data: { refreshToken: hashedRefreshToken } })
+  }
+
+  async deleteRefreshToken(id: number): Promise<User> {
+    return await this.update({ where: { id }, data: { refreshToken: null } })
+  }
+
   async isEmailExists(email: string): Promise<boolean> {
     const user = await this.getByEmail(email, true)
     return !!user

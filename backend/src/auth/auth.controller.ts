@@ -1,7 +1,4 @@
 import { Controller, Get, Query } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { JwtService } from '@nestjs/jwt'
-
 import { PendingEmailChangeService } from '@src/pendingEmailChange/pendingEmailChange.service'
 import { AuthService } from './auth.service'
 import { CustomUnauthorizedException } from './errors/customUnauthorized.exception'
@@ -10,10 +7,8 @@ import { JwtPayload } from './types/jwt.type'
 @Controller('auth')
 export class AuthController {
   constructor(
-    private configService: ConfigService,
     private authService: AuthService,
     private pendingEmailChangeService: PendingEmailChangeService,
-    private jwtService: JwtService,
   ) {}
 
   @Get('verify-email')
@@ -21,7 +16,7 @@ export class AuthController {
     let decoded: JwtPayload | undefined = undefined
 
     try {
-      decoded = this.authService.verifyJwtToken(token)
+      decoded = this.authService.verifyToken('email', token)
     } catch (error) {
       throw new CustomUnauthorizedException('invalidToken', error.message)
     }
@@ -36,7 +31,7 @@ export class AuthController {
     let decoded: JwtPayload | undefined = undefined
 
     try {
-      decoded = this.authService.verifyJwtToken(token)
+      decoded = this.authService.verifyToken('email', token)
     } catch (error) {
       throw new CustomUnauthorizedException('invalidToken', error)
     }

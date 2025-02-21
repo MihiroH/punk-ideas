@@ -73,6 +73,7 @@ const main = async () => {
           nickname: faker.helpers.arrayElement([faker.person.firstName(), null]),
           age: faker.number.int({ min: 10, max: 80 }),
           emailVerifiedAt: faker.helpers.arrayElement([now, null]),
+          refreshToken: null,
           updatedAt: now,
           deletedAt: null,
         })),

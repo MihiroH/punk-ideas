@@ -45,7 +45,7 @@ export class StorageService {
       undefinedEnvVars.push('S3_BUCKET')
     }
 
-    // !region || !accessKeyId || !secretAccessKey || !bucketNameのチェックは本来不要だが、後の行でtsエラーになってしまうため追加
+    // undefinedEnvVars.length > 0 以外のチェックは本来不要だが、後の行でtsエラーになってしまうため追加
     if (undefinedEnvVars.length > 0 || !region || !accessKeyId || !secretAccessKey || !bucketName) {
       throw new CustomInternalServerErrorException(
         `${undefinedEnvVars.join(', ')} is not defined in the environment variables`,
