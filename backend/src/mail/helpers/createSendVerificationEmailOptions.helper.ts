@@ -9,22 +9,22 @@ interface CreateSendVerificationEmailOptionsArgs {
   toAddress: string
   mailVerificationUrl: string
   token: string
-  tokenExpirationTime: string
+  tokenExpiresIn: string
   subject: string
   bodyTemplate: string
 }
 
 export const createSendVerificationEmailOptions = ({
-  token,
   username,
   fromAddress,
   toAddress,
   mailVerificationUrl,
-  tokenExpirationTime,
+  tokenExpiresIn,
+  token,
   subject,
   bodyTemplate,
 }: CreateSendVerificationEmailOptionsArgs): SendEmailOptions => {
-  const expirationTime = calculateExpirationTime(tokenExpirationTime)
+  const expirationTime = calculateExpirationTime(tokenExpiresIn)
   const formattedExpirationTime = format(expirationTime, 'yyyy/MM/dd HH:mm:ss')
   const verificationUrlObj = new URL(mailVerificationUrl)
   verificationUrlObj.searchParams.append('token', token)

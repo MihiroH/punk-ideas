@@ -11,19 +11,20 @@ import { AuthController } from './auth.controller'
 import { AuthResolver } from './auth.resolver'
 import { AuthService } from './auth.service'
 import { JwtStrategy } from './strategies/jwt.strategy'
+import { JwtRefreshStrategy } from './strategies/jwtRefresh.strategy'
 import { LocalStrategy } from './strategies/local.strategy'
 
 @Module({
   imports: [
     ConfigModule,
-    JwtModule.register({ secret: process.env.JWT_SECRET, signOptions: { expiresIn: process.env.JWT_EXPIRES_IN } }),
+    JwtModule.register({}),
     MailModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     PendingEmailChangeModule,
     PrismaModule,
     UserModule,
   ],
-  providers: [AuthResolver, AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthResolver, AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}

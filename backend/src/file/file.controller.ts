@@ -5,6 +5,7 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { JwtRestAuthGuard } from '@src/auth/guards/jwtRestAuth.guard'
 import { CustomBadRequestException } from '@src/common/errors/customBadRequest.exception'
 import { FileService } from './file.service'
+import { parseFileSize } from './helpers/parseFileSize'
 import { FileSizeValidationPipe } from './pipes/fileSizeValidation.pipe'
 
 @Controller('file')
@@ -17,9 +18,7 @@ export class FileController {
   async uploadFileAndPassValidation(
     @UploadedFile(
       new ParseFilePipe({
-        validators: [
-          new FileSizeValidationPipe(5 * 1024 * 1024), // 5MBの制限
-        ],
+        validators: [new FileSizeValidationPipe(parseFileSize('5MB'))],
       }),
     )
     file: Express.Multer.File,

@@ -466,6 +466,20 @@
           "maxLength": null
         },
         {
+          "id": "public.m_users.refresh_token",
+          "name": "refresh_token",
+          "columnName": "refresh_token",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "t_comment_favorites",
           "type": "t_comment_favorites",
           "isRequired": false,

@@ -75,6 +75,9 @@ export class User extends UserRelations {
   @Field(() => Date, { nullable: true })
   emailVerifiedAt: Date | null
 
+  @Field(() => String, { nullable: true })
+  refreshToken: string | null
+
   @Field()
   createdAt: Date
 

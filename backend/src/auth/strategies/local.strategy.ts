@@ -7,7 +7,7 @@ import { AuthService } from '../auth.service'
 import { CustomUnauthorizedException } from '../errors/customUnauthorized.exception'
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(private authService: AuthService) {
     super({
       usernameField: 'email',

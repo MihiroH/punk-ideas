@@ -20,6 +20,7 @@ import { UserModule } from './user/user.module'
       driver: ApolloDriver,
       playground: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      context: ({ req, res }: { req: Request; res: Response }) => ({ req, res }),
     }),
     AuthModule,
     CategoryModule,

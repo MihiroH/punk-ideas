@@ -10,7 +10,7 @@ import { CustomUnauthorizedException } from '../errors/customUnauthorized.except
 import { JwtPayload } from '../types/jwt.type'
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private authService: AuthService,
     private userService: UserService,
@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<User> {
-    const user = await this.userService.getByEmail(payload.email)
+    const user = await this.userService.getById(payload.sub)
 
     if (!user) {
       throw new CustomUnauthorizedException('userNotFound')
