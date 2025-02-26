@@ -1,32 +1,16 @@
-import { ArgsType, Field, Int } from '@nestjs/graphql'
-import { ArrayNotEmpty, IsIn, IsOptional } from 'class-validator'
+import { ArgsType, Field, IntersectionType } from '@nestjs/graphql'
+import { ArrayNotEmpty, IsOptional } from 'class-validator'
 
 import { IsOrderByFieldValid } from '@src/common/decorators/isOrderByValid.decorator'
 import { OrderByArgs } from '@src/common/dto/orderBy.args'
-import { OPEN_LEVELS } from '../constants/idea.constant'
+import { PaginationArgs } from '@src/common/dto/pagination.args'
+import { IdeasGetBaseArgs } from './ideasGetBase.args'
 
 @ArgsType()
-export class IdeasGetArgs {
-  @Field(() => String, { nullable: true })
-  @IsOptional()
-  title?: string
-
-  @Field(() => String, { nullable: true })
-  @IsOptional()
-  content?: string
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsIn(Object.values(OPEN_LEVELS), { message: `openLevel must be either ${Object.values(OPEN_LEVELS).join(', ')}` })
-  openLevel?: number
-
+export class IdeasGetArgs extends IntersectionType(IdeasGetBaseArgs, PaginationArgs) {
   @Field(() => [OrderByArgs], { nullable: true })
   @IsOptional()
   @ArrayNotEmpty()
   @IsOrderByFieldValid(['id', 'title', 'content', 'openLevel', 'createdAt', 'updatedAt'])
   orderBy?: OrderByArgs[]
-
-  @Field(() => Boolean, { nullable: true })
-  @IsOptional()
-  includeReportedBySelf?: boolean
 }

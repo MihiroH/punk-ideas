@@ -3,6 +3,7 @@ import { IsIn } from 'class-validator'
 
 import { Category } from '@src/category/category.model'
 import { Comment } from '@src/comment/comment.model'
+import { createConnectionType } from '@src/common/models/pagination.model'
 import { IdeaCategory } from '@src/ideaCategory/ideaCategory.model'
 import { IdeaFavorite } from '@src/ideaFavorite/ideaFavorite.model'
 import { IdeaFile } from '@src/ideaFile/ideaFile.model'
@@ -90,3 +91,6 @@ export class Idea extends IdeaRelations {
   @Field(() => Date, { nullable: true })
   deletedAt: Date | null
 }
+
+@ObjectType()
+export class IdeaConnection extends createConnectionType(Idea) {}

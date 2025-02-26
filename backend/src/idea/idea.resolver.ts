@@ -10,21 +10,22 @@ import { CustomBadRequestException } from '@src/common/errors/customBadRequest.e
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { User } from '@src/user/user.model'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
+import { IdeasCountArgs } from './dto/ideasCount.args'
 import { IdeasGetArgs } from './dto/ideasGet.args'
-import { Idea } from './idea.model'
+import { Idea, IdeaConnection } from './idea.model'
 import { IdeaService } from './idea.service'
 
 @Resolver()
 export class IdeaResolver {
   constructor(private ideaService: IdeaService) {}
 
-  @Query(() => [Idea], { nullable: true })
+  @Query(() => IdeaConnection)
   @UseGuards(OptionalJwtAuthGuard)
   async ideas(
     @RequestedFields() requestedFields: RequestedFieldsMap,
     @Args() ideasGetArgs?: IdeasGetArgs,
     @AuthenticatedUser() user?: User,
-  ): Promise<Idea[]> {
+  ): Promise<IdeaConnection> {
     CustomBadRequestException.validateOrThrow([
       {
         condition: ideasGetArgs?.includeReportedBySelf === false && user?.id === undefined,
@@ -50,7 +51,7 @@ export class IdeaResolver {
     ])
 
     const relations = this.ideaService.createRelations(
-      Object.keys(requestedFields),
+      Object.keys(requestedFields.edges.node),
       this.ideaService.FIELD_RELATIONS,
       user?.id,
     )
@@ -64,10 +65,10 @@ export class IdeaResolver {
 
   @Query(() => Int)
   @UseGuards(OptionalJwtAuthGuard)
-  async ideasCount(@Args() ideasGetArgs?: IdeasGetArgs, @AuthenticatedUser() user?: User): Promise<number> {
+  async ideasCount(@Args() ideasCountArgs?: IdeasCountArgs, @AuthenticatedUser() user?: User): Promise<number> {
     CustomBadRequestException.validateOrThrow([
       {
-        condition: ideasGetArgs?.includeReportedBySelf === false && user?.id === undefined,
+        condition: ideasCountArgs?.includeReportedBySelf === false && user?.id === undefined,
         message: {
           field: 'ideasCount.argument.includeReportedBySelf',
           error: "Authorization Bearer token is required if 'includeReportedBySelf' is set to false",
@@ -76,10 +77,10 @@ export class IdeaResolver {
     ])
 
     if (user) {
-      return await this.ideaService.count({ ideasGetArgs, reporterId: user?.id })
+      return await this.ideaService.count({ ideasCountArgs, reporterId: user?.id })
     }
 
-    return await this.ideaService.count({ ideasGetArgs })
+    return await this.ideaService.count({ ideasCountArgs })
   }
 
   @Query(() => Idea)

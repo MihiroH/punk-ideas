@@ -23,6 +23,13 @@ type Category {
   updatedAt: DateTime!
 }
 
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
 type IdeaCategory {
   category: Category
   id: Int!
@@ -77,6 +84,17 @@ type Idea {
   createdAt: DateTime!
   updatedAt: DateTime!
   deletedAt: DateTime
+}
+
+type IdeaEdge {
+  cursor: String!
+  node: Idea!
+}
+
+type IdeaConnection {
+  edges: [IdeaEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type CommentRelationsCount {
@@ -137,8 +155,8 @@ type SignInResponse {
 type Query {
   user: User!
   categories: [Category!]!
-  ideas(title: String, content: String, openLevel: Int, orderBy: [OrderByArgs!], includeReportedBySelf: Boolean): [Idea!]
-  ideasCount(title: String, content: String, openLevel: Int, orderBy: [OrderByArgs!], includeReportedBySelf: Boolean): Int!
+  ideas(title: String, content: String, openLevel: Int, includeReportedBySelf: Boolean, first: Int, after: String, last: Int, before: String, orderBy: [OrderByArgs!]): IdeaConnection!
+  ideasCount(title: String, content: String, openLevel: Int, includeReportedBySelf: Boolean): Int!
   idea(id: Int!): Idea!
 }
 
