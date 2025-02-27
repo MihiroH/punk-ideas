@@ -8,18 +8,21 @@ export interface RequestedFieldsMap {
 
 const parseRequestedFields = (fieldNodes: FieldNode[]): RequestedFieldsMap => {
   return fieldNodes.reduce<RequestedFieldsMap>((fields, node) => {
-    if (node.selectionSet) {
-      for (const selection of node.selectionSet.selections) {
-        if (selection.kind === 'Field') {
-          const fieldName = selection.name.value
-          if (selection.selectionSet) {
-            fields[fieldName] = parseRequestedFields([selection])
-          } else {
-            fields[fieldName] = {}
-          }
+    if (!node.selectionSet) {
+      return fields
+    }
+
+    for (const selection of node.selectionSet.selections) {
+      if (selection.kind === 'Field') {
+        const fieldName = selection.name.value
+        if (selection.selectionSet) {
+          fields[fieldName] = parseRequestedFields([selection])
+        } else {
+          fields[fieldName] = {}
         }
       }
     }
+
     return fields
   }, {})
 }

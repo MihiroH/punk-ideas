@@ -10,8 +10,9 @@ import { PRISMA_CLIENT_ERROR_CODE } from '@src/prisma/constants/prisma.constant'
 import { PrismaService } from '@src/prisma/prisma.service'
 import { FIELD_RELATIONS } from './constants/idea.constant'
 import { IdeaCreateInput } from './dto/ideaCreate.input'
+import { IdeasCountArgs } from './dto/ideasCount.args'
 import { IdeasGetArgs } from './dto/ideasGet.args'
-import { Idea, IdeaRelations } from './idea.model'
+import { Idea, IdeaConnection, IdeaRelations } from './idea.model'
 
 @Injectable()
 export class IdeaService {
@@ -149,9 +150,20 @@ export class IdeaService {
   async list(
     args?: { ideasGetArgs?: IdeasGetArgs; reporterId?: number },
     include?: Prisma.IdeaInclude,
-  ): Promise<Idea[]> {
+  ): Promise<IdeaConnection> {
     const { ideasGetArgs, reporterId } = args ?? {}
-    const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
+    const { title, content, orderBy, includeReportedBySelf, first, after, last, before, ...restArgs } =
+      ideasGetArgs ?? {}
+
+    const cursorOptions = this.prismaService.buildCursorOptions({ first, after, last, before })
+    const formattedOrderBy = this.prismaService.formatOrderBy(orderBy)
+
+    // 次のページがあるかどうかを判断するため、1つ多めに取得
+    const take = cursorOptions.take
+      ? cursorOptions.take > 0
+        ? cursorOptions.take + 1
+        : cursorOptions.take - 1
+      : undefined
 
     const resources = await this.prismaService.client.idea.findMany({
       where: {
@@ -168,16 +180,52 @@ export class IdeaService {
               },
         ...restArgs,
       },
-      orderBy: this.prismaService.formatOrderBy(orderBy),
+      orderBy: formattedOrderBy,
       include,
+      ...cursorOptions,
+      take,
     })
 
-    return resources.map((r) => this.formatIdea(r))
+    const hasMore = !!take && resources.length > Math.abs(take ?? 0) - 1
+    if (hasMore) {
+      resources.pop() // 余分に取得した分を削除
+    }
+
+    const formattedResources = resources.map((r) => this.formatIdea(r))
+    const edges = formattedResources.map((node) => ({
+      cursor: this.prismaService.encodeCursor(node.id),
+      node,
+    }))
+
+    if (last) {
+      edges.reverse()
+    }
+
+    const {
+      orderBy: _orderBy,
+      first: _first,
+      after: _after,
+      last: _last,
+      before: _before,
+      ...ideasCountArgs
+    } = ideasGetArgs ?? {}
+    const totalCount = await this.count({ ideasCountArgs, reporterId })
+
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage: last ? false : hasMore,
+        hasPreviousPage: first ? false : hasMore,
+        startCursor: edges.length > 0 ? edges[0].cursor : null,
+        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+      },
+      totalCount,
+    }
   }
 
-  async count(args?: { ideasGetArgs?: IdeasGetArgs; reporterId?: number }): Promise<number> {
-    const { reporterId, ideasGetArgs } = args ?? {}
-    const { title, content, orderBy, includeReportedBySelf, ...restArgs } = ideasGetArgs ?? {}
+  async count(args?: { ideasCountArgs?: IdeasCountArgs; reporterId?: number }): Promise<number> {
+    const { reporterId, ideasCountArgs } = args ?? {}
+    const { title, content, includeReportedBySelf, ...restArgs } = ideasCountArgs ?? {}
 
     return await this.prismaService.client.idea.count({
       where: {
@@ -194,7 +242,6 @@ export class IdeaService {
               },
         ...restArgs,
       },
-      orderBy: this.prismaService.formatOrderBy(orderBy),
     })
   }
 

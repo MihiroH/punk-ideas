@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import { Prisma, PrismaClient } from '@prisma/client'
 
 import { OrderByArgs } from '@src/common/dto/orderBy.args'
+import { PaginationArgs } from '@src/common/dto/pagination.args'
 import { ResourceNotFoundException } from '@src/common/errors/resourceNotFound.exception'
 import { deepMergeObjects } from '@src/common/helpers/deepMergeObjects.helper'
 import { DEFAULT_ORDER_BY, PRISMA_CLIENT_ERROR_CODE } from './constants/prisma.constant'
@@ -66,7 +67,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     return this.transactionClient ?? this.prismaClient
   }
 
-  formatOrderBy(orderBy: OrderByArgs[] = DEFAULT_ORDER_BY) {
+  formatOrderBy(orderBy: OrderByArgs[] = this.DEFAULT_ORDER_BY) {
     return orderBy.reduce<Array<Record<string, string>>>((acc, { field, order }) => {
       acc.push({ [field]: order })
       return acc
@@ -99,6 +100,43 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     )
 
     return relations
+  }
+
+  encodeCursor(id: number): string {
+    return Buffer.from(`${id}`).toString('base64')
+  }
+
+  decodeCursor(cursor: string): { id: number } {
+    const id = Buffer.from(cursor, 'base64').toString()
+    return {
+      id: Number.parseInt(id, 10),
+    }
+  }
+
+  buildCursorOptions({ first, after, last, before }: PaginationArgs): {
+    take?: number
+    skip?: number
+    cursor?: { id: number }
+  } {
+    const options: { take?: number; skip?: number; cursor?: { id: number } } = {}
+
+    if (first) {
+      options.take = first
+      if (after) {
+        const { id } = this.decodeCursor(after)
+        options.cursor = { id }
+        options.skip = 1
+      }
+    } else if (last) {
+      options.take = -last
+      if (before) {
+        const { id } = this.decodeCursor(before)
+        options.cursor = { id }
+        options.skip = 1
+      }
+    }
+
+    return options
   }
 
   async deleteWithRelations<ModelName extends CamelCasedModelName = CamelCasedModelName>(
