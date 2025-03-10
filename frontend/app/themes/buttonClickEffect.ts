@@ -1,3 +1,5 @@
+// @see: https://ant.design/docs/blog/happy-work#configprovider
+
 import type { WaveConfig } from 'antd/lib/config-provider/context'
 
 const createHolder = (node: HTMLElement) => {
