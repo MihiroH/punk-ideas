@@ -1,0 +1,21 @@
+@import "antd/dist/reset.css";
+
+:root {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
+}
+
+html,
+body {
+  background-color: white;
+  font-family: var(--font-sans);
+}
+
+@media (prefers-color-scheme: dark) {
+  html,
+  body {
+    background-color: #030712;
+    color-scheme: dark;
+    color: white;
+  }
+}
