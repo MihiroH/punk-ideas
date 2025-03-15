@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react'
 import { Links, Meta, Scripts, ScrollRestoration } from 'react-router'
 
-export function RootLayout({ children }: { children: React.ReactNode }) {
+export function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ja">
       <head>

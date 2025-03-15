@@ -1,13 +1,12 @@
 import { Outlet } from 'react-router'
 import type { Route } from './+types/root'
 import '@ant-design/v5-patch-for-react-19'
+import type { ReactNode } from 'react'
 
-import './app.css'
-import { ErrorContent } from './components/ErrorContent'
-import ErrorLayout from './layouts/ErrorLayout'
-import { RootLayout } from './layouts/RootLayout'
-import { CustomThemeProvider } from './themes'
-import { AntdConfigProvider } from './themes/AntdConfigProvider'
+import '~/app.css'
+import { ErrorContent } from '~/common/components/ErrorContent'
+import { ErrorLayout, RootLayout } from '~/common/layouts'
+import { AntdConfigProvider, CustomThemeProvider } from '~/common/themes'
 
 export const links: Route.LinksFunction = () => [
   {
@@ -26,7 +25,7 @@ export const links: Route.LinksFunction = () => [
   },
 ]
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: { children: ReactNode }) {
   return <RootLayout>{children}</RootLayout>
 }
 

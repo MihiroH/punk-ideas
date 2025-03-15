@@ -1,7 +1,7 @@
 import { DatePicker } from 'antd'
 import { useEffect, useState } from 'react'
 
-export default function ClientDatePicker() {
+export function ClientDatePicker() {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {

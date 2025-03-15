@@ -1,6 +1,6 @@
 import { type ReactNode, createContext } from 'react'
 
-import { type CustomThemeToken, customThemeToken } from './themes'
+import { type CustomThemeToken, customThemeToken } from '../config'
 
 export const CustomThemeContext = createContext<CustomThemeToken | undefined>(undefined)
 

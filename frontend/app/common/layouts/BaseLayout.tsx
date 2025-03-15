@@ -1,10 +1,11 @@
 import { Layout, Menu } from 'antd'
+import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 
 import { useCustomTheme } from '../themes'
 
 interface BaseLayoutProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 const { Header, Content } = Layout
