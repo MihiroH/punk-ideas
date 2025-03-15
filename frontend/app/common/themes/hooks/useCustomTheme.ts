@@ -1,7 +1,7 @@
 import { theme as antdTheme } from 'antd'
 import { useContext } from 'react'
 
-import { CustomThemeContext } from './CustomThemeContext'
+import { CustomThemeContext } from '../contexts/CustomThemeProvider'
 
 // Ant Design の useToken() + CustomThemeContext を統合する
 export const useCustomTheme = () => {
