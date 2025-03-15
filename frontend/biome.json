@@ -3,10 +3,12 @@
   "organizeImports": {
     "enabled": true
   },
+  "files": {
+    "ignore": [".react-router/**/*", "**/*.min.*"]
+  },
   "formatter": {
     "enabled": true,
     "formatWithErrors": false,
-    "ignore": [".react-router/**/*"],
     "attributePosition": "multiline",
     "indentStyle": "space",
     "indentWidth": 2,
@@ -24,8 +26,7 @@
         "noUnusedVariables": "error",
         "noUnusedImports": "error"
       }
-    },
-    "ignore": [".react-router/**/*"]
+    }
   },
   "javascript": {
     "formatter": {

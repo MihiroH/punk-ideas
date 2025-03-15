@@ -1,12 +1,19 @@
-import { ConfigProvider } from 'antd'
-import jaJP from 'antd/locale/ja_JP'
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from 'react-router'
+import { Outlet } from 'react-router'
 import type { Route } from './+types/root'
+import '@ant-design/v5-patch-for-react-19'
 
 import './app.css'
-import { CustomThemeProvider, antdTheme, showInsetEffect, useDarkMode } from './themes'
+import { ErrorContent } from './components/ErrorContent'
+import ErrorLayout from './layouts/ErrorLayout'
+import { RootLayout } from './layouts/RootLayout'
+import { CustomThemeProvider } from './themes'
+import { AntdConfigProvider } from './themes/AntdConfigProvider'
 
 export const links: Route.LinksFunction = () => [
+  {
+    rel: 'stylesheet',
+    href: '/css/antd.min.css',
+  },
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
     rel: 'preconnect',
@@ -20,80 +27,28 @@ export const links: Route.LinksFunction = () => [
 ]
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1"
-        />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
-  )
+  return <RootLayout>{children}</RootLayout>
 }
 
 export default function App() {
-  const { algorithm } = useDarkMode()
-
   return (
-    <ConfigProvider
-      locale={jaJP}
-      theme={{
-        ...antdTheme,
-        algorithm,
-      }}
-      wave={{ disabled: false, showEffect: showInsetEffect }}
-    >
+    <AntdConfigProvider>
       <CustomThemeProvider>
         <Outlet />
       </CustomThemeProvider>
-    </ConfigProvider>
+    </AntdConfigProvider>
   )
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = 'Oops!'
-  let details = 'An unexpected error occurred.'
-  let stack: string | undefined
-
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? '404' : 'Error'
-    details = error.status === 404 ? 'The requested page could not be found.' : error.statusText || details
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message
-    stack = error.stack
-  }
-
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
   return (
-    <main
-      style={{
-        paddingTop: '4rem',
-        padding: '1rem',
-        maxWidth: '1200px',
-        margin: '0 auto',
-      }}
-    >
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre
-          style={{
-            width: '100%',
-            padding: '1rem',
-            overflowX: 'auto',
-          }}
-        >
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <AntdConfigProvider>
+      <CustomThemeProvider>
+        {/* NOTE: DefaultLayoutをConfiguring Routesとここで併用するとErrorContentが表示されなくなるため、同じ内容のErrorLayoutでラップしている */}
+        <ErrorLayout>
+          <ErrorContent {...props} />
+        </ErrorLayout>
+      </CustomThemeProvider>
+    </AntdConfigProvider>
   )
 }

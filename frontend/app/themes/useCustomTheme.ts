@@ -5,12 +5,12 @@ import { CustomThemeContext } from './CustomThemeContext'
 
 // Ant Design の useToken() + CustomThemeContext を統合する
 export const useCustomTheme = () => {
-  const antdToken = antdTheme.useToken()
+  const { token, hashId, theme } = antdTheme.useToken()
   const customToken = useContext(CustomThemeContext)
 
   if (!customToken) {
     throw new Error('useCustomTheme must be used within a CustomThemeProvider')
   }
 
-  return { ...antdToken, customToken }
+  return { token, customToken, hashId, theme }
 }
