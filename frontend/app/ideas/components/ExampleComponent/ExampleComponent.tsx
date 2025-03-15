@@ -15,5 +15,3 @@ export function ExampleComponent() {
     </div>
   )
 }
-
-export default ExampleComponent

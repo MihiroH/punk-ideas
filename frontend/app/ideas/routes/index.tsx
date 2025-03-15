@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 
-import ExampleComponent from '~/ideas/components/ExampleComponent/ExampleComponent'
+import { ExampleComponent } from '~/ideas/components/ExampleComponent/ExampleComponent'
 import { useIdeaStore } from '~/ideas/store'
 import type { Idea } from '~/ideas/types/example'
 
