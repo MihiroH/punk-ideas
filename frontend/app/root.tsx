@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router'
 import type { Route } from './+types/root'
+import '@ant-design/v5-patch-for-react-19'
 
 import './app.css'
 import { ErrorContent } from './components/ErrorContent'
