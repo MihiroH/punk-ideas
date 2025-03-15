@@ -10,6 +10,10 @@ import { CustomThemeProvider } from './themes'
 import { AntdConfigProvider } from './themes/AntdConfigProvider'
 
 export const links: Route.LinksFunction = () => [
+  {
+    rel: 'stylesheet',
+    href: '/css/antd.min.css',
+  },
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
     rel: 'preconnect',
