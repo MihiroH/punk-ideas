@@ -1,13 +1,13 @@
 import { Outlet } from 'react-router'
-import type { Route } from './+types/root'
+import type { Route } from '~/+types/root'
 import '@ant-design/v5-patch-for-react-19'
 
-import './app.css'
-import { ErrorContent } from './components/ErrorContent'
-import ErrorLayout from './layouts/ErrorLayout'
-import { RootLayout } from './layouts/RootLayout'
-import { CustomThemeProvider } from './themes'
-import { AntdConfigProvider } from './themes/AntdConfigProvider'
+import '~/app.css'
+import { ErrorContent } from '~/common/components/ErrorContent'
+import ErrorLayout from '~/common/layouts/ErrorLayout'
+import { RootLayout } from '~/common/layouts/RootLayout'
+import { CustomThemeProvider } from '~/common/themes/contexts/CustomThemeContext'
+import { AntdConfigProvider } from '~/common/themes/contexts/AntdConfigContext'
 
 export const links: Route.LinksFunction = () => [
   {
